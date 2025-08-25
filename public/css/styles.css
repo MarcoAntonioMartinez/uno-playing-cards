@@ -1,0 +1,22 @@
+html {
+    min-height: 100%;
+  }  
+
+  body {
+    min-height: 100%;
+    padding: 40px 0;
+  /*  background: linear-gradient(90deg, #003f5b, #00405d, #004b66, #006978, #009d6c, #00b640, #42bd13, #49be00); /* made at https://learnui.design/tools/gradient-generator.html */
+    color: rgba(17, 17, 17, 1.0);
+    font-family: 'Lora', serif;
+    
+  }
+
+div{ /*just for effect*/ 
+  border:1px solid brown; 
+  display:inline-block;
+  padding-top: 40px;
+}
+img{
+  cursor:pointer;
+  text-decoration:underline;
+}
