@@ -1,0 +1,10 @@
+<h1>UNO with Playing Cards </h1>
+
+<h2> Your hand</h2>
+<div id="img">
+<% @card_arr.each_with_index do |c, i| %>
+
+<img id="card<%= i %>" class="card" src=<%= c %> onclick="move(event)">
+
+<% end %>
+</div>
