@@ -1,0 +1,20 @@
+<form action="/checked"
+<div>
+<h2> Your hand</h2>
+</div>
+
+<div>
+<h2> Discard pile</h2>
+
+<% @pile_arr.each_with_index do |c, i| %>
+
+<li>  
+   <img src="<%= c %>" id="<%= @code %>"  /></label>
+</li>
+
+<% end %>
+</ul>
+</div>
+
+<button> check</button>
+</form>

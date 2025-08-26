@@ -1,13 +1,20 @@
 <h1>UNO with Playing Cards </h1>
 <!-- /api/process-click"> -->
-<form method="POST">
+<form action="/discard">
 <h2> Your hand</h2>
-<div id="img">
+<!-- <div id="img"> -->
 <% @card_arr.each_with_index do |c, i| %>
 
+<ul>
+<!--
 <img id="card<%= i %>" class="card" src=<%= c %> onclick="move(event)">
+-->
+<li><input type="checkbox" id="card<%= i %>" name="<%= @code %>" /> 
+  <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>"  /></label>
+</li>
 
 <% end %>
-</div>
+</ul>
+<!-- </div> -->
 <button>Discard</button>
 </form>

@@ -18,3 +18,10 @@ end
 ```
 
 Some rights reserved — see [LICENSE.txt](LICENSE.txt)
+
+<!--
+ <% @checked.each do |c| %>
+<%= c %>
+<%= @p %>
+<% end %>
+ -->

@@ -1,4 +1,3 @@
-//import { send } from '/js/send.js';
 
 function move(e) {
 
