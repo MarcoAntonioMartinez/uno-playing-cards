@@ -11,10 +11,6 @@ var cardX = 0;
    card.style.position = "relative";
    card.style.transform = "translateY(" + -cardX + "px)";
   
-const src = e.target.src;
-
-//send(src);
-   
 
 
 };
