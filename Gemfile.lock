@@ -109,6 +109,8 @@ GEM
       nio4r (~> 2.0)
     racc (1.6.2)
     rack (2.2.8)
+    rack-contrib (2.5.0)
+      rack (< 4)
     rack-protection (3.0.6)
       rack
     rack-test (2.1.0)
@@ -196,6 +198,7 @@ DEPENDENCIES
   i18n
   pry
   puma (~> 5.0)
+  rack-contrib
   rspec
   rspec-html-matchers
   sinatra
