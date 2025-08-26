@@ -98,11 +98,11 @@ resp = HTTP.get(pile_list)
 
   @pile_arr = []
 
-  
+  @code_arr = []
   cards.each do |c| 
     @pile_arr.push(c.fetch("image"))
 
-    @code = c.fetch("code")
+    @code_arr.push(c.fetch("code"))
   end
 
   erb(:discard)
