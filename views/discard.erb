@@ -1,15 +1,30 @@
-<form action="/checked"
+<form action="/checked">
 <div>
 <h2> Your hand</h2>
 </div>
 
 <div>
 <h2> Discard pile</h2>
-
+<h2> <%= @discard %>
 <% @pile_arr.each_with_index do |c, i| %>
 
 <li>  
-   <img src="<%= c %>" id="<%= @code[i] %>"  /></label>
+   <img src="<%= c %>" id="<%= @code_arr[i] %>"  /></label>
+</li>
+
+<% end %>
+</ul>
+</div>
+
+<h1> <%=@pile %></h1>
+
+<div>
+<h2> Your hand</h2>
+
+<% @hand_arr.each_with_index do |h, i| %>
+
+<li>  
+   <img src="<%= h %>" id="<%= @hand_code[i] %>"  /></label>
 </li>
 
 <% end %>
