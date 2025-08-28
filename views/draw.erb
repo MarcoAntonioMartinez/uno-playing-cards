@@ -1,0 +1,23 @@
+<form action="/discard">
+<div>
+<h2> Your hand</h2>
+</div>
+
+<div>
+<h2> Discard pile</h2>
+
+<h2> new hand </h2>
+<% @image.each_with_index do |c, i| %>
+
+<li> <input type="radio" id="hand<%= i %>" name="hand_choice"/> 
+<label for="hand<%= i %>">
+   <img src="<%= c %>" id="<%= i %>"  /></label>
+</li>
+</label>
+<!--- 
+< % = @code_arr[i] % >
+--->
+<% end %>
+<button> discard</button>
+<button formaction="/draw"> draw</button>
+</form>

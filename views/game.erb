@@ -1,40 +1,68 @@
 <h1>UNO with Playing Cards </h1>
 <!-- /api/process-click"> -->
 <form action="/discard">
-<h2> Your hand</h2>
-<!-- <div id="img"> -->
-<% @card_arr.each_with_index do |c, i| %>
+  <h2> Your hand</h2>
+  <!-- <div id="img"> -->
 
-<ul>
-<!--
+  <%= @disable %>
+  <% @disabled_arr.each do |c| %>
+    <h1> this is value of cards <%= @value %> </h1>
+    <%= c %>
+  <% end %>
+  <!--   -->
+  <% @card_arr.each_with_index do |c, i| %>
+
+    <% if @disable[i]%>
+
+      <ul>
+        <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>" class="disabled" disabled />
+          <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>"  /></label>
+        </li>
+      </ul>
+
+    <% else %>
+      <ul>
+        <!--
 <img id="card<%= i %>" class="card" src=<%= c %> onclick="move(event)">
 -->
-<li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>" /> 
-  <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>"  /></label>
-</li>
+        <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>" />
+          <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>"  /></label>
+        </li>
 
-<% end %>
-</ul>
+      </ul>
+    <% end %> <!-- end of if -->
+  <% end %> <!-- end of loop -->
+<!-- 
+  <h1> discards: <%= @discards %></h1>
+  <h1> first card: <%= @first_card[0] %></h1>
+  <h1> game_starting_draw url: <%= @game_starting_draw %></h1>
 
-<h1> discards: <%= @discards %></h1>
-<h1> first card: <%= @first_card[0] %></h1>
-<h1> game_starting_draw url: <%= @game_starting_draw %></h1>
+  <h1> card image: <%= @card %></h1>
+  <h1> first card code: <%= @code %></h1>
+-->
+  <div>
+    <h1> Draw pile </h1>
+    <!--
+    <label for="draw" id="draw_image"> <a href="/draw" id="draw_ref" name="draw"><input type="radio" name="draw" id="draw">  draw </a> </>
+         <img src="https://deckofcardsapi.com/static/img/back.png"  />  
+    
+      </label> 
+    
+      -->
 
-<h1> card image: <%= @card %></h1>
-<h1> first card code: <%= @code %></h1>
+      <label for="draw" id="draw_image"> <button formaction="/draw" type="submit" id="draw" name="draw" value="draw"> draw</button>
+      <img src="https://deckofcardsapi.com/static/img/back.png"  />  
+      </label> 
+  </div>
 
-<div>
-<h1> Draw pile </h1>
-<img src="https://deckofcardsapi.com/static/img/back.png" id="draw" />
-</div>
+  <div>
+    <h1> Discard pile </h1>
+    <input type="checkbox" id="start_card" name="start_card" />
+    <label for="start-card" > <img src="<%= @card %>" id="start_card"  /></label>
 
-<div>
-<h1> Discard pile </h1>
-<input type="checkbox" id="start_card" name="start_card" /> 
-  <label for="start-card" > <img src="<%= @card %>" id="start_card"  /></label>
+  </div>
 
-</div>
+  <!-- </div> -->
+  <button>Discard</button>
 
-<!-- </div> -->
-<button>Discard</button>
 </form>
