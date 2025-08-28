@@ -16,9 +16,23 @@
 <% end %>
 </ul>
 
+<h1> discards: <%= @discards %></h1>
+<h1> first card: <%= @first_card[0] %></h1>
+<h1> game_starting_draw url: <%= @game_starting_draw %></h1>
+
+<h1> card image: <%= @card %></h1>
+<h1> first card code: <%= @code %></h1>
 
 <div>
+<h1> Draw pile </h1>
 <img src="https://deckofcardsapi.com/static/img/back.png" id="draw" />
+</div>
+
+<div>
+<h1> Discard pile </h1>
+<input type="checkbox" id="start_card" name="start_card" /> 
+  <label for="start-card" > <img src="<%= @card %>" id="start_card"  /></label>
+
 </div>
 
 <!-- </div> -->

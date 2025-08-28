@@ -6,6 +6,7 @@ require "rack/contrib/json_body_parser"
 require "sinatra/contrib"
 
 use Rack::JSONBodyParser
+
 =begin
 pile_name = "draw"
 
@@ -23,7 +24,19 @@ pile = "https://deckofcardsapi.com/api/deck/" +  "/pile/" + pile_name + "/add/?c
 
 =end 
 
+# idk if i should go and replace the code with this function now or later ill find out i guess
+def api_response(url, key)
+  resp = HTTP.get(url)
 
+  raw_response = resp.to_s 
+  
+  parsed_response = JSON.parse(raw_response)
+
+  #so i dont have to basically make a variable the same as parsed response on line 33 (2 lines above here)
+  return fetched_key = parsed_response.fetch(key)
+
+  #return fetched_key
+end
 
 
 get("/") do
@@ -69,32 +82,26 @@ resp = HTTP.get(start_game)
     cookies[:hand] = (@code_arr.join(",")) 
   end
 
-  ######################################## draw from whole deck to add to pile
 
-deck_draw = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=45"
+  pile_name = "hand"
 
-resp = HTTP.get(deck_draw)
+  #add hand before discarding from pile is this necessary? idk i could just add the cards to the pile but whatever or i could make the pile in the game action
+  @pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + cookies[:hand]
 
-  raw_response = resp.to_s
+  resp = HTTP.get(@pile)
 
-  parsed_response = JSON.parse(raw_response)
 
-  deck_cards = parsed_response.fetch("cards")
+################################################### end of making new deck and hand
 
-  @deck_arr = []
+################################################### start of adding player 2 to game in other words the bot - goes in game
+################################################### end of adding player 2 to game in other words the bot - goes in game
 
-  @deck_code_arr = []
+
+  ######################################## draw from whole deck to add to pile  -> not right i dont need to add a whole pile I can just draw from deck and add it to pile idk why i thought i needed this
+
+ 
   
-  
-  deck_cards.each do |c| 
-    @deck_code_arr.push(c.fetch("code"))
-  end
-
-  deck_pile = @deck_code_arr.join(",")
-
-  pile_name = "draw"
-
-# create new pile draw which contains whole rest of deck
+=begin create new pile draw which contains whole rest of deck -> not right i dont need to add a whole pile I can just draw from deck and add it to pile idk why i thought i needed this
 pile = "https://deckofcardsapi.com/api/deck/" + deck +  "/pile/" + pile_name + "/add/?cards=" + deck_pile 
 
   resp = HTTP.get(pile)
@@ -113,14 +120,61 @@ resp = HTTP.get(pile_list)
   parsed_response = JSON.parse(raw_response)
 
   draw_pile = parsed_response.fetch("piles").fetch("draw").fetch("cards")
-=begin
+
   draw_cards.each do |c| 
     @deck_code_arr.push(c.fetch("code"))
   end
 
   deck_pile = @deck_code_arr.join(",")
+=end
 
-=end  
+
+
+
+################################################### start of take top card from deck and place on discard pile which starts the game - place on game action
+
+@game_starting_draw = "https://deckofcardsapi.com/api/deck/" + deck +  "/draw/?count=1"
+
+
+#need to get first card
+@first_card = api_response(@game_starting_draw, "cards")
+#@first_card[0]
+
+
+@first_card.each do |c| 
+    @card = c.fetch("image")
+
+    @code= c.fetch("code")
+  
+    
+  end
+
+  
+# need to add to discard pile
+pile_name = "discard"
+
+
+first_discard = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + @code
+
+#adds first card to discard pile
+resp = HTTP.get(first_discard)
+
+# need to add to pile
+pile_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+
+# actually adds to pile
+resp = HTTP.get(pile_list)
+
+#make it so the cards that do not match the most recent card are disabled
+
+
+################################################### end of take top card from deck and place on discard pile which starts the game - place on game action
+
+
+
+################################################### start of discard only 1 card at a time - place on game action
+################################################### end of discard only 1 card at a time - place on game action
+
 
 
 
@@ -134,7 +188,7 @@ end
 
 
 get("/discard") do
-
+#i will need to do something with discard parameter i think
 #has the chosen cards to be discarded
   @checked = []
   @discard = ""
@@ -150,27 +204,27 @@ get("/discard") do
 
   #string of hand cards
   hand = cookies[:hand]
-  new_hand_arr = []
+  discarded_arr = []
 
-  new_hand = ""
+  discarded_card = ""
 
   #check what card(s) were discarded from hand and change hand accordingly
   hand_arr.each do |h|
     if @checked.include?(h)
-      new_hand_arr.push(h)
+      discarded_arr.push(h)
     end
  
     
   end
 
-  new_hand = new_hand_arr.join(",")
+  discarded_card = discarded_arr.join(",")
 
   ## ################# hand pile            maybe i dont need to get the parsed response when im adding cards to piles
   
   pile_name = "hand"
 
   #add hand before discarding from pile is this necessary? idk i could just add the cards to the pile but whatever or i could make the pile in the game action
-  @pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + hand
+  @pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + discarded_card
 
   resp = HTTP.get(@pile)
 
@@ -250,6 +304,17 @@ resp = HTTP.get(pile_list)
 
     @code_arr.push(c.fetch("code"))
   end
+
+
+################################## #################  end of discard pile
+
+
+################################################### start of take discarded card and place on discard pile do action if necessary - either suit must match or value must match
+################################################### end of take discarded card and place on discard pile do action if necessary - either suit must match or value must match
+
+################################################### start of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
+################################################### end of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
+
 
   erb(:discard)
 
