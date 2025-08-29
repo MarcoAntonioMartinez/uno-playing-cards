@@ -150,9 +150,7 @@ resp = HTTP.get(pile_list)
   # need to add to pile
   pile_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
 
-  # actually adds to pile
-  #resp = HTTP.get(pile_list)
-
+  
   #make it so the cards that do not match the most recent card are disabled
 
   #make array that's filled with cards that do not match the suit or value of card in discard pile or are not king or ace cards
@@ -177,26 +175,24 @@ resp = HTTP.get(pile_list)
   c = cards.join(",")
   d = @disabled_arr.join(",")
 
-  cookies[:count] = 0
+  cookies[:add_card] = false
   #maybe this part needs to be in draw action
   #how to make this true when button is pressed
-=begin
-if c == d 
 
-################################################### start of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
- draw = "https://deckofcardsapi.com/api/deck/" + deck +  "/draw/?count=1"
+  #if c == d
+
+  ################################################### start of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
+  draw = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=1"
   new_card = api_response(draw, "cards")
 
   new_card.each do |n|
-
     @code = n.fetch("code")
   end
 
   pile_name = "hand"
-add_hand = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + @code
-resp = HTTP.get(add_hand)
+  add_hand = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + @code
+  resp = HTTP.get(add_hand)
 
-=end
   ################################################### end of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
 
   ################################################### end of take top card from deck and place on discard pile which starts the game - place on game action
@@ -358,38 +354,101 @@ resp = HTTP.get(add_hand)
   deck = cookies[:deck_id]
 
   pile_name = "hand"
-  did_draw = params.fetch("draw")
-  
+  @did_draw = params.fetch("draw")
+
+  #next_draw = params.fetch("draw")
   count = cookies[:count].to_i
-#make sure only gets called once
-    count += 1
 
-    #make sure cookies gets updated
-    cookies[:count] = count
+  @add_card = cookies[:add_card]
+  #make sure only gets called once
+  count += 1
 
-  if did_draw = "draw" && count == 1
-    draw = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=1"
-    new_card = api_response(draw, "cards")
+  #make sure cookies gets updated
+  cookies[:count] = count
 
-    new_card.each do |n|
+
+  @begin = @add_card
+
+  @is_next = @did_draw == "next_draw" && @add_card = true
+
+  if @did_draw == "next_draw" && @add_card == true
+
+    @draw = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=1"
+    @new_card = api_response(@draw, "cards")
+
+    @new_card.each do |n|
       @code = n.fetch("code")
     end
 
-    
+    pile_name = "hand"
     add_hand = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + @code
     resp = HTTP.get(add_hand)
-    
-    
+
+    #card was added
+    @add_card = false
+
+    @in_next_draw = @add_card
+  else
+    @in_else = true
   end
 
+  cookies[:add_card] = false
 
   hand_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
   @hand = api_response(hand_list, "piles").fetch(pile_name).fetch("cards")
 
   @image = []
-
+  
   @hand.each do |h|
     @image.push(h.fetch("image"))
+  
+  end
+
+
+
+################################################### end of making draw work
+
+################################################### start of disabled logic
+
+pile_name = "discard"
+
+discard_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+
+@discard_res = api_response(discard_list, "piles").fetch(pile_name).fetch("cards")
+
+#get last added card which would be on top of discard pile
+@discard_arr = []
+
+@discard_res.each_with_index do |d, i|
+@in = i
+@dlen = @discard_res.length
+  if i == @discard_res.length - 1
+@top_discard = d
+end
+
+@discard_arr.push(d.fetch("image"))
+
+end
+#@top_discard.class
+#make it so the cards that do not match the most recent card are disabled
+
+  #make array that's filled with cards that do not match the suit or value of card in discard pile or are not king or ace cards
+  @disabled_arr = []
+  @disable = []
+  #has code for cards in hand
+  @hand.each_with_index do |c, i|
+
+    #this code should still work with this project I think i just need to change the whole thing from checkboxes to radio buttons bc i only need to choose one
+    if !(c.fetch("value") == @top_discard["value"] || c.fetch("suit") == @top_discard["suit"] || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
+      @disabled_arr.push(c)
+    end
+
+    if @disabled_arr.include?(c)
+      @disable.push(true)
+    else
+      @disable.push(false)
+    end
+
   end
 
   erb(:draw)
