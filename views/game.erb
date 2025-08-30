@@ -63,6 +63,17 @@
   </div>
 
   <!-- </div> -->
-  <button>Discard</button>
+ <% if @disable_button%>
+<button disabled> discard</button>
+<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+    <img src="https://deckofcardsapi.com/static/img/back.png"  />
+  </label>
+  <% else %>
+<button> discard</button>
+<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+    <img src="https://deckofcardsapi.com/static/img/back.png"  />
+  </label>
+
+  <% end %>
 
 </form>

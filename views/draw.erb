@@ -2,21 +2,21 @@
   <div>
     <h2> Your hand</h2>
 
-    <% @image.each_with_index do |c, i| %>
+    <% @hand.each_with_index do |c, i| %>
 
       <% if @disable[i]%>
 
         <ul>
-          <li><input type="checkbox" id="card<%= i %>" name="<%= i %>" class="disabled" disabled />
-            <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>"  /></label>
+          <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>" class="disabled" disabled />
+            <label for="card<%= i %>" > <img src="<%= @image[i] %>" id="c<%= i+1 %>"  /></label>
           </li>
         </ul>
 
       <% else %>
         <ul>
 
-          <li><input type="checkbox" id="card<%= i %>" name="<%= i %>" />
-            <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>"  /></label>
+          <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>" />
+            <label for="card<%= i %>" > <img src="<%= @image[i] %>" id="c<%= i+1 %>"  /></label>
           </li>
 
         </ul>
@@ -43,8 +43,21 @@
 <% end %> <!-- end of loop -->
   </div>
 
-  <button> Discard</button>
-  <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+
+
+
+
+<% if @disable_button%>
+<button disabled> discard</button>
+<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
     <img src="https://deckofcardsapi.com/static/img/back.png"  />
   </label>
+  <% else %>
+<button> discard</button>
+<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+    <img src="https://deckofcardsapi.com/static/img/back.png"  />
+  </label>
+
+  <% end %>
+  
 </form>

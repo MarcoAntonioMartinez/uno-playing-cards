@@ -1,6 +1,29 @@
 <form action="/discard">
 <div>
 <h2> Your hand</h2>
+ 
+
+    <% @hand_arr.each_with_index do |c, i| %>
+
+      <% if @disable[i]%>
+
+        <ul>
+          <li><input type="checkbox" id="card<%= i %>" name="<%= @hand_code[i] %>" class="disabled" disabled />
+            <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>"  /></label>
+          </li>
+        </ul>
+
+      <% else %>
+        <ul>
+
+          <li><input type="checkbox" id="card<%= i %>" name="<%= @hand_code[i] %>" />
+            <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>"  /></label>
+          </li>
+
+        </ul>
+      <% end %> <!-- end of if -->
+    <% end %> <!-- end of loop -->
+  </div>
 </div>
 
 <div>
@@ -8,29 +31,34 @@
 <h2> <%= @discard %>
 <% @pile_arr.each_with_index do |c, i| %>
 
-<li>  
+  <li>  
    <img src="<%= c %>" id="<%= @code_arr[i] %>"  /></label>
 </li>
 
 <% end %>
 </ul>
+
+
+
+
 </div>
 
 <h1> <%=@pile %></h1>
+<h1>discarded card is <%=@discarded_card %></h1>
+<h1>@discard  is <%=@discard %></h1>
+<h1>@curr_hand  is <%=@curr_hand %></h1>
 
-<div>
-<h2> Your hand</h2>
 
-<% @hand_arr.each_with_index do |h, i| %>
-
-<li>  
-   <img src="<%= h %>" id="<%= @hand_code[i] %>"  /></label>
-</li>
-
-<% end %>
-</ul>
-</div>
-
+<% if @disable_button%>
+<button disabled> discard</button>
+<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+    <img src="https://deckofcardsapi.com/static/img/back.png"  />
+  </label>
+  <% else %>
 <button> discard</button>
-<button formaction="/draw"> draw</button>
+<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+    <img src="https://deckofcardsapi.com/static/img/back.png"  />
+  </label>
+
+  <% end %>
 </form>
