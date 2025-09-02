@@ -28,44 +28,26 @@
 
 <div>
 <h2> Discard pile</h2>
-<h2> new_king is <%= @new_king %> </h2>
-<h2> new_king is <%= @in_king %> </h2>
-<h2> top discard is <%= @top_discard %> </h2>
+<h2> pile is <%= @pile %> </h2>
 
-<h2> <%= @discard %> </h2>
-<h2> pile is:  <%= @pile %> </h2>
 <h2> new_king is <%= @new_king %> </h2>
 
-<ul>
-<% @pile_arr.each_with_index do |c, i| %>
+<h2> cards is <%= @cards %> </h2>
 
-<li>  
-   <img src="<%= c %>" id="<%= @code_arr[i] %>"  /></label>
+<h2> king deck is <%= @king_deck %> </h2>
+
+<ul> 
+<% @new_king_arr.each_with_index do |c, i| %>
+
+  <li>  
+   <img src="<%= c %>" id="<%= @new_king_codes[i] %>"  /></label>
 </li>
-
 <% end %>
 </ul>
-
-
-
-
-<h2> <%= @discard %> </h2>
-<h2> pile is:  <%= @pile %> </h2>
-<h2> new_king is <%= @new_king %> </h2>
-
-<ul>
-
-<% @king_arr.each_with_index do |c, i| %>
-
-
-
-<label for="king_disc<%= i %>" id="king_disc_img<%= i %>"> <button formaction="/discard/king" type="submit" id="king_disc<%= i %>" name="king" value="<%= @king_codes[i] %>"> </button>
-    <img src=" <%= c %>"  />
-  </label>
-
-
-<% end %>
+ 
 </div>
+
+
 
 
 
