@@ -93,7 +93,12 @@ label img {
   padding: 100px;
 }
 
-#draw {
- /* display:none;*/
+#next_draw {
+  display:none;
+ 
+}
+
+#king_disc {
+  display:none;
  
 }
