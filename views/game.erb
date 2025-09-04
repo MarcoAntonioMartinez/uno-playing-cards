@@ -1,22 +1,24 @@
 <h1>UNO with Playing Cards </h1>
 <!-- /api/process-click"> -->
 <form action="/discard">
+  <div>
+  <h2> op's hand</h2>
+  <% @c_image.each_with_index do |c,i| %>
+<input type="checkbox" id="op<%= i %>" name="op<%= i %>" />
+          <label for="op<%= i %>"   id="op<%= i+1 %>"  > <img src="<%= c %>"/> </label>
+          <% end %>
+</div>
+<div>
   <h2> Your hand</h2>
   <!-- <div id="img"> -->
 
-  <%= @disable %>
-  <% @disabled_arr.each do |c| %>
-    <h1> this is value of cards <%= @value %> </h1>
-    <%= c %>
-  <% end %>
-  <!--   -->
   <% @card_arr.each_with_index do |c, i| %>
 
     <% if @disable[i]%>
 
       <ul>
         <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>" class="disabled" disabled />
-          <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>"  /></label>
+          <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>" class="disabled"  /></label>
         </li>
       </ul>
 
@@ -32,7 +34,7 @@
       </ul>
     <% end %> <!-- end of if -->
   <% end %> <!-- end of loop -->
-<!-- 
+  <!-- 
   <h1> discards: <%= @discards %></h1>
   <h1> first card: <%= @first_card[0] %></h1>
   <h1> game_starting_draw url: <%= @game_starting_draw %></h1>
@@ -40,6 +42,7 @@
   <h1> card image: <%= @card %></h1>
   <h1> first card code: <%= @code %></h1>
 -->
+</div>
   <div>
     <h1> Draw pile </h1>
     <!--
@@ -50,9 +53,9 @@
     
       -->
 
-      <label for="draw" id="draw_image"> <button formaction="/draw" type="submit" id="draw" name="draw" value="draw"> draw</button>
-      <img src="https://deckofcardsapi.com/static/img/back.png"  />  
-      </label> 
+    <label for="draw" id="draw_image"> <button formaction="/draw" type="submit" id="draw" name="draw" value="draw"> draw</button>
+      <img src="https://deckofcardsapi.com/static/img/back.png"  />
+    </label>
   </div>
 
   <div>
@@ -63,16 +66,16 @@
   </div>
 
   <!-- </div> -->
- <% if @disable_button%>
-<button disabled> discard</button>
-<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
-    <img src="https://deckofcardsapi.com/static/img/back.png"  />
-  </label>
+  <% if @disable_button%>
+    <button disabled> discard</button>
+    <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+      <img src="https://deckofcardsapi.com/static/img/back.png"  />
+    </label>
   <% else %>
-<button> discard</button>
-<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
-    <img src="https://deckofcardsapi.com/static/img/back.png"  />
-  </label>
+    <button> discard</button>
+    <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+      <img src="https://deckofcardsapi.com/static/img/back.png"  />
+    </label>
 
   <% end %>
 
