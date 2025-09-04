@@ -89,8 +89,10 @@ label img {
 }
 
 .disabled {
-  border-color:brown;
-  padding: 100px;
+  border: solid;
+  
+  border-color:rgb(165, 42, 42);
+  
 }
 
 #next_draw {
