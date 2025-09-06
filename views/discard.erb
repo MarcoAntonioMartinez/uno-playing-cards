@@ -1,13 +1,18 @@
 <form action="/discard">
 
+<div class="scroll-container">
+  <div class="long-content">
+   <%  @text.each do |c| %>
+    <p> <%= c %> </p>
+    <%end%>
+  </div>
+
+  </div>
+
 
 <div>
   <h2> op's hand</h2>
-  <h2> cpu hand add cards <%= @ch_pile %></h2>
-  <h2> cpu hand discard pile <%= @cd_pile %></h2>
-  <h2> cpu hand list <%= @chl_pile %></h2>
-  <h2> new hand <%= @new_cards %></h2>
-  
+ 
   <% @new_images.each_with_index do |c,i| %>
 <input type="checkbox" id="op<%= i %>" name="op<%= i %>" />
           <label for="op<%= i %>"   id="op<%= i+1 %>"  > <img src="<%= c %>"/> </label>
@@ -46,18 +51,19 @@
 
 <div>
 <h2> Discard pile</h2>
-<h2> new_king is <%= @new_king %> </h2>
-<h2> new_king is <%= @in_king %> </h2>
-<h2> top discard is <%= @top_discard %> </h2>
+<!--
+<h2> new_king is < %= @new_king % > </h2>
+<h2> new_king is < % = @in_king % > </h2>
+<h2> top discard is < % = @top_discard % > </h2>
 
 <h2> <%= @discard %> </h2>
 <h2> pile is:  <%= @pile %> </h2>
 <h2> new_king is <%= @new_king %> </h2>
-
+-->
 <ul>
 <% @pile_arr.each_with_index do |c, i| %>
 
-<li>  
+<li>  <label>
    <img src="<%= c %>" id="<%= @code_arr[i] %>"  /></label>
 </li>
 
@@ -72,7 +78,7 @@
 <h2> new_king is <%= @new_king %> </h2>
 
 <ul>
-
+<% if @is_king  %>
 <% @king_arr.each_with_index do |c, i| %>
 
 
@@ -81,6 +87,8 @@
     <img src=" <%= c %>"  />
   </label>
 
+
+<% end %>
 
 <% end %>
 </div>
