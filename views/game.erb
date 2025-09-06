@@ -1,6 +1,10 @@
 <h1>UNO with Playing Cards </h1>
 <!-- /api/process-click"> -->
 <form action="/discard">
+
+
+
+
   <div>
   <h2> op's hand</h2>
   <% @c_image.each_with_index do |c,i| %>
@@ -61,7 +65,7 @@
   <div>
     <h1> Discard pile </h1>
     <input type="checkbox" id="start_card" name="start_card" />
-    <label for="start-card" > <img src="<%= @card %>" id="start_card"  /></label>
+    <label for="start-card" > <img src="<%= @card %>" id="start_card" class="discard" /></label>
 
   </div>
 
