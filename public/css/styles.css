@@ -104,3 +104,22 @@ label img {
   display:none;
  
 }
+
+.discard {
+  height: 100px;
+  width: 100px;
+}
+
+.scroll-container {
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+  overflow: auto; /* Adds scrollbars only when content overflows */
+  padding: 10px;
+}
+.long-content {
+  width: 400px; /* Wider than container */
+  height: 300px; /* Taller than container */
+  background-color: lightblue;
+  padding: 20px;
+}
