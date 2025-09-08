@@ -124,11 +124,13 @@ label img {
   padding: 20px;
 }
 
-#king_button {
-  display: none;
+.king_btns {
+  display:none;
+  
 }
 
-:checked + #cKH, #cKD, #cKS, #cKC ~ #king_button {
+:checked + label img[id="cKH"] ~ .king_btns, :checked + label img[id="cKD"] ~ .king_btns, :checked + label img[id="cKS"] ~ .king_btns, :checked + label img[id="cKC"] ~ .king_btns {
   display:block;
 
 }
+

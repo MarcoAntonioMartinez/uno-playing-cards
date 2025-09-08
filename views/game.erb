@@ -2,43 +2,49 @@
 <!-- /api/process-click"> -->
 <form action="/discard">
 
-
-
-
   <div>
-  <h2> op's hand</h2>
-  <% @c_image.each_with_index do |c,i| %>
-<input type="checkbox" id="op<%= i %>" name="op<%= i %>" />
-          <label for="op<%= i %>"   id="op<%= i+1 %>"  > <img src="<%= c %>"/> </label>
-          <% end %>
-</div>
-<div>
-  <h2> Your hand</h2>
-  <!-- <div id="img"> -->
+    <h2> op's hand</h2>
+    <% @c_image.each_with_index do |c,i| %>
+      <input type="checkbox" id="op<%= i %>" name="op<%= i %>" />
+      <label for="op<%= i %>"   id="op<%= i+1 %>"  > <img src="<%= c %>"/> </label>
+    <% end %>
+  </div>
+  <div>
+    <h2> Your hand</h2>
+    <!-- <div id="img"> -->
 
-  <% @card_arr.each_with_index do |c, i| %>
+    <% @card_arr.each_with_index do |c, i| %>
 
-    <% if @disable[i]%>
+      <% if @disable[i]%>
 
-      <ul>
-        <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>" class="disabled" disabled />
-          <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>" class="disabled"  /></label>
-        </li>
-      </ul>
+        <ul>
+          <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>" class="disabled" disabled />
+            <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>" class="disabled"  /></label>
+          </li>
+        </ul>
 
-    <% else %>
-      <ul>
+      <% else %>
+        <ul>
+          <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>"  />
+            <label for="card<%= i %>" >
+              <img src="<%= c %>" id="c<%= @code_arr[i] %>"   />
+              <button id="ks_button" class="king_btns"> </button>
+              <button id="kc_button" class="king_btns"> </button>
+              <button id="kh_button" class="king_btns"> </button>
+              <button id="kd_button" class="king_btns">  </button>
+            </label>
+
+          </li>
+        </ul>
+
+
         <!--
 <img id="card<%= i %>" class="card" src=<%= c %> onclick="move(event)">
 -->
-        <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>" />
-          <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>"  /></label>
-        </li>
 
-      </ul>
-    <% end %> <!-- end of if -->
-  <% end %> <!-- end of loop -->
-  <!-- 
+      <% end %> <!-- end of if -->
+    <% end %> <!-- end of loop -->
+    <!-- 
   <h1> discards: <%= @discards %></h1>
   <h1> first card: <%= @first_card[0] %></h1>
   <h1> game_starting_draw url: <%= @game_starting_draw %></h1>
@@ -46,7 +52,7 @@
   <h1> card image: <%= @card %></h1>
   <h1> first card code: <%= @code %></h1>
 -->
-</div>
+  </div>
   <div>
     <h1> Draw pile </h1>
     <!--
