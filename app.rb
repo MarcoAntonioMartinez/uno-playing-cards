@@ -65,37 +65,34 @@ def largest_hash_key(hash)
 end
 
 #draw the extra kings/aces from deck to make the cpu hand work properly
-def draw_extras(deck, value)
-#draw the king to be changed from discard pile
-  draw = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?cards=1"
-  res = api_response(draw, "cards")[0]
-  val = res.fetch("value")
-  code = res.fetch("code")
-  cnt = 0
-  extra = []
-  while (cnt != 4)
-    #only push unique king values
-    if val == value && !extra.include?(res)
-      extra.push(res)
-       cnt += 1
-    else
-      #may or may not have to add that discarded card back to deck somehow
-      return_url = "https://deckofcardsapi.com/api/deck/" + deck + "/return/?cards=" + code
-      resp = api_response(return_url, "success")
+#adds those extras to new pile which will be used to change suits when discarding aces and kings
+# def draw_extras(deck, extra_ak)
+# #draw the king to be changed from discard pile
+#   # draw = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?cards=8"
+#   # res = api_response(draw, "cards")[0]
+#   # puts "#{res}\n"
+#    pile_name = "extras"
+#   #need to get all cards so i think i need to do array like usual and push codes to array
+   
+#   pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + extra_ak#extra_cards
+#   res = api_response(pile, "piles")
+  
+#   pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+#   dr_res = api_response(pile, "piles").fetch(pile_name).fetch("cards")
+  
+#   c_extra = []
+#   dr_res.each do |d|
+# c_extra.push(d.fetch("code"))
 
-      draw = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?cards=1"
-      res = api_response(draw, "cards")[0]
-      val = res.fetch("value")
-      code = res.fetch("code")
-    end
-  end
-end
+#     #puts "#{c_extra}\n"
+#   end
+# end
 
-def get_deck_api_url(deck, pile, action = 'list', cards = nil)
-  base_url = "https://deckofcardsapi.com/api/deck/#{deck}/pile/#{pile}/"
-  action = cards.nil? ? action : "#{action}/?cards=#{cards}"
-  base_url + action
-end
+# def get_deck_api_url(deck, pile, action = 'list', cards = nil)
+#   base_url = "https://deckofcardsapi.com/api/deck/#{deck}/pile/#{pile}/"
+#   action = cards.nil? ? action : "#{action}/?cards=#{cards}"
+#   base_url + action
+# end
 #usage
 #hand_list = get_deck_api_url(deck, 'hand', 'list') seems its only good when i need to add cards idk anything that needs a list of cards
 
@@ -103,9 +100,13 @@ end
 def cpu()
   deck = cookies[:deck_id]
   puts "deck in cpu() is #{deck}"
-  cpu_url = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=7"
+  pile_name = "deck"
+  cpu_url = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?count=7"
   puts "cpu url is #{cpu_url}"
   cpu_cards = api_response(cpu_url, "cards")
+
+  # cpu_url = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+# cpu_cards = api_response(cpu_url, "piles").fetch(pile_name).fetch("cards")
 
   @cpu_card_arr = []
 
@@ -119,7 +120,7 @@ def cpu()
 
     values.push(c.fetch("value"))
     suits.push(c.fetch("suit"))
-    puts "values is #{values}"
+    # puts "values is #{values}"
   end
 
   cookies[:cpu_card] = (@cpu_card_arr.join(","))
@@ -151,144 +152,7 @@ end
 ####################################################################################################################
 =begin 
 def cpu_discard(value, suit)
-  cpu_cards = cookies[:cpu_cards].split(",")
-
-  #check which cards match what i discarded
-  cpu_hand = cookies[:cpu_hand].split(",")
-
-  deck = cookies[:deck_id]
-
-  values = cookies[:values].split(",")
-
-  suits = cookies[:suits].split(",")
-
-  # if last discarded card was a jack or queen the cpu skips its turn
-  if value != "JACK" || value != "QUEEN"
-
-    heart_cnt = 0 
-    dmnd_cnt = 0 
-    spade_cnt = 0 
-    club_cnt = 0
-    #count how many of each suit there is to determine what to change the king/ace into
-
-    suits.each do |s|
-      case s
-      when "HEARTS"
-        heart_cnt += 1
-      when "DIAMONDS"
-        dmnd_cnt += 1
-      when "SPADES"
-        spade_cnt += 1
-      when "CLUBS"
-        club_cnt += 1
-      end
-    end
-
-    suit_hash = { :hearts => heart_cnt, :diamonds => dmnd_cnt, :spades => spade_cnt, :clubs => club_cnt }
-    
-
-    largest = largest_hash_key(suit_hash)
-    l_val = largest[1]
-
-    max_suit = ""
-    suit_hash.each_value do |v|
-
-      
-      #if value in suit hash is equal to the max value of all the counters
-      if v == l_val
-
-        #find out which suit it is
-        case v
-        when v == heart_cnt
-          max_suit = "HEARTS"
-        when v == dmnd_cnt
-          max_suit = "DIAMONDS"
-        when v == spade_cnt
-          max_suit = "SPADES"
-        when v == club_cnt
-          max_suit = "CLUBS"
-        end #case
-      end #if
-    end #each_value
-
-      #checked is card that was discarded so if i try to match it to this hand that means checked is player 1 discard so cpu has to match it checked has code so
-     discarded = ""
-     #max_suit = ""
-      cpu_hand.each_with_index do |h, i|
-        if value == values[i] || suit == suits[i] || values[i] == "KING" || values[i] == "ACE"
-        #cookies[:cpu_len] = cpu_hand.length
-        #cookies[:suits_len] = suits.length
-        discarded = h
-        end
-      end
-
-      if discarded == "KC" || discarded == "KH" || discarded == "KD" || discarded == "KS"
-        case max_suit
-        when "HEARTS"
-          discarded = "KH"
-        when "DIAMONDS"
-          discarded = "KD"
-        when "SPADES"
-          discarded = "KS"
-        when "CLUBS"
-          discarded = "KC"
-        end
-      
-      elsif discarded == "AC" || discarded == "AH" || discarded == "AD" || discarded == "AS"
-        case max_suit
-        when "HEARTS"
-          discarded = "AH"
-        when "DIAMONDS"
-          discarded = "AD"
-        when "SPADES"
-          discarded = "AS"
-        when "CLUBS"
-          discarded = "AC"
-        end
-
-        draw_4 = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=4"
-        draw_4_cards = api_response(draw_4, "cards")
-        pile_name = "hand"
-
-        d4 = []
-        draw_4_cards.each do |d|
-          d4.push(d.fetch("code"))
-        end
-        d4_cards = d4.join(",")
-        pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + d4_cards
-        res = HTTP.get(pile)
-
-      end #if statement for aces
-
-    
-
-      # draw the card from the cpu hand
-      pile_name = "cpu_hand"
-      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + discarded
-      res = HTTP.get(pile)
-
-      # add the discarded card to discard pile
-      pile_name = "discard"
-      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + discarded
-      res = HTTP.get(pile)
-
-      pile_name = "cpu_hand"
-      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
-      new_cards = api_response(pile, "piles").fetch(pile_name).fetch("cards")
-
-      @new_images = []
-      new_cards.each do |n|
-        @new_images.push(n.fetch("image"))
-      end
-
-      
-      #return new_cards
-
-      #for some reason having just the methods here messes up later code for getting the hand pile discard_res
-    
-    
-    end # if with jack/queen
-  
+ 
 
   end
 =end
@@ -308,23 +172,22 @@ get("/game") do
   deck = parsed_response.fetch("deck_id")
 
   draw_52 = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=52"
-  cards = api_response(draw_52, "cards")
+  ft_cards = api_response(draw_52, "cards")
   deck_extra = []
 
-  cards.each do |c|
+  ft_cards.each do |c|
     deck_extra.push(c.fetch("code"))
   end
 
-  cards_extra_ak = deck_extra.join(",")
+  cards_deck_pile = deck_extra.join(",")
 
-  extra_ak = ",AC,AD,AH,AS,KH,KC,KD,KS"
 
-  cards_extra_ak = cards_extra_ak + extra_ak
+  # deck = api_response(new_deck, "deck_id")
 
-  new_deck = "https://deckofcardsapi.com/api/deck/new/shuffle/?cards=" + cards_extra_ak
-
-  deck = api_response(new_deck, "deck_id")
-  puts "deck in game is #{deck}"
+  # #draw 52 from the new deck with extra kings and aces
+  # draw_52 = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=60"
+  # cards = api_response(draw_52, "cards")
+  # puts "deck in game is #{deck}"
   # url = start()
   # deck = new_deck(url)
 
@@ -332,52 +195,39 @@ get("/game") do
   #deck = cookies[:deck_id]
   cookies[:deck_id] = deck
 
-  # #draw the king to be changed from discard pile
-  # draw_king = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?cards=1"
-  # kdc = api_response(draw_king, "cards")[0]
-  # kdc_val = kdc.fetch("value")
-  # kdc_code = kdc.fetch("code")
-  # kingcnt = 0
-  # extra_king = []
-  # while (kingcnt != 4)
-  #   #only push unique king values
-  #   if kdc_val == "KING" && !extra_king.include?(kdc)
-  #     extra_king.push(kdc)
-  #     kingcnt += 1
-  #   else
-  #     #may or may not have to add that discarded card back to deck somehow
-  #     return_url = "https://deckofcardsapi.com/api/deck/" + deck + "/return/?cards=" + kdc_code
-  #     resp = api_response(return_url, "success")
+  #add the 52 cards from the deck
+pile_name = "deck"
 
-  #     draw_king = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?cards=1"
-  #     kdc = api_response(draw_king, "cards")[0]
-  #     kdc_val = kdc.fetch("value")
-  #     kdc_code = kdc.fetch("code")
-  #   end
-  # end
-
-  draw_extras(deck, "KING")
-  draw_extras(deck, "ACE")
+  pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + cards_deck_pile
+  deck_pile = api_response(pile, "piles")
+#   puts "deck pile is #{deck_pile}"
+# extra = "AC,AD,AH,AS,KH,KC,KD,KS"
+# draw_extras(deck, extra )
+  #draw_extras(deck, "KING")
+ # draw_extras(deck, "ACE")
 
   #at this point extra kings will have been drawn from deck so add to new pile extra
   #so do same for aces first check if that other code works
 
   #see if drawing extra aces and kings fixes issues of bot hand not having kings and aces
-  pile_name = "extras"
-  extra_cards = "AS,AC,AH,AD,KS,KC,KH,KD"
-  pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + extra_cards
+  # pile_name = "extras"
+  # extra_cards = "AS,AC,AH,AD,KS,KC,KH,KD"
+  # pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + extra_cards
 
   #***********************************************************end of extra kings aces logic
   #start game by drawing 7 cards
-  start_game = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=7"
+  pile_name = "deck"
+  start_game = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name +  "/draw/?count=7"
+  re = api_response(start_game, "cards")
 
-  resp = HTTP.get(start_game)
+#   start_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+# resp = HTTP.get(start_list)
 
-  raw_response = resp.to_s
+  # raw_response = resp.to_s
 
-  parsed_response = JSON.parse(raw_response)
+  # parsed_response = JSON.parse(raw_response)
 
-  cards = parsed_response.fetch("cards")
+  cards = re
 
   @card_arr = []
 
@@ -396,7 +246,7 @@ get("/game") do
   #add hand before discarding from pile is this necessary? idk i could just add the cards to the pile but whatever or i could make the pile in the game action
   @pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + cookies[:hand]
 
-  resp = HTTP.get(@pile)
+  rea = api_response(@pile, "success")
   ################################################### start of cpu cards
   #start game by drawing 7 cards
 =begin
@@ -476,22 +326,26 @@ resp = HTTP.get(pile_list)
 =end
 
   ################################################### start of take top card from deck and place on discard pile which starts the game - place on game action
-
-  @game_starting_draw = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=1"
+pile_name = "deck"
+  @game_start = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?count=1"
 
   #need to get first card
-  @first_card = api_response(@game_starting_draw, "cards")
-  #@first_card[0]
+  # game_card = api_response(@game_start, "success")
+  
+  # @game_starting_draw = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
 
-  @first_card.each do |c|
-    @card = c.fetch("image")
+  #need to get first card
+  @first_card = api_response(@game_start, "cards")[0]
 
-    @code = c.fetch("code")
+  #@first_card.each do |c|
+     @card = @first_card.fetch("image")
 
-    @value = c.fetch("value")
+    @code = @first_card.fetch("code")
 
-    @suit = c.fetch("suit")
-  end
+    # @value = c.fetch("value")
+
+    # @suit = c.fetch("suit")
+  # end
 
   # need to add to discard pile
   pile_name = "discard"
@@ -499,11 +353,10 @@ resp = HTTP.get(pile_list)
   first_discard = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + @code
 
   #adds first card to discard pile
-  resp = HTTP.get(first_discard)
-
+api_response(first_discard, "success")
   # need to add to pile
-  pile_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
-
+#   pile_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+#  api_response(pile_list, "success")
   #make it so the cards that do not match the most recent card are disabled
 
   #make array that's filled with cards that do not match the suit or value of card in discard pile or are not king or ace cards
@@ -621,261 +474,6 @@ get("/discard") do
 
   @text = []
   @text.push("You discarded the #{discarded_value} of #{discarded_suit}")
-  #not sure where to put this
-  #cpu_discard(discarded_value, discarded_suit)
-  #see if any errors pop up when i just put all the code for cpu discard here *************************************************************
-
-  pile_name = "cpu_hand"
-  pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
-  @cpu_h_cards = api_response(pile, "piles").fetch(pile_name).fetch("cards")
-  cpu_cards = cookies[:cpu_cards].split(",")
-
-  #check which cards match what i discarded
-  #cpu_hand = cookies[:cpu_hand].split(",")
-  cpu_h_codes = []
-  cpu_h_vals = []
-  cpu_h_suits = []
-  @cpu_h_cards.each do |c|
-    cpu_h_codes.push(c.fetch("code"))
-    cpu_h_vals.push(c.fetch("value"))
-    cpu_h_suits.push(c.fetch("suit"))
-  end
-  deck = cookies[:deck_id]
-
-  values = cookies[:values].split(",")
-
-  suits = cookies[:suits].split(",")
-
-  # if last discarded card was a jack or queen the cpu skips its turn
-  #  if discarded_value != "JACK" || discarded_value != "QUEEN"
-
-  heart_cnt = 0
-  dmnd_cnt = 0
-  spade_cnt = 0
-  club_cnt = 0
-  #count how many of each suit there is to determine what to change the king/ace into
-
-  cpu_h_suits.each do |s|
-    case s
-    when "HEARTS"
-      heart_cnt += 1
-    when "DIAMONDS"
-      dmnd_cnt += 1
-    when "SPADES"
-      spade_cnt += 1
-    when "CLUBS"
-      club_cnt += 1
-    end
-  end
-
-  suit_hash = { :hearts => heart_cnt, :diamonds => dmnd_cnt, :spades => spade_cnt, :clubs => club_cnt }
-
-  largest = largest_hash_key(suit_hash)
-  l_val = largest[1]
-
-  max_suit = ""
-  more_than_1 = []
-  index = 0
-  suit_hash.each_value do |v|
-
-    #if value in suit hash is equal to the max value of all the counters
-    if v == l_val
-      puts "v is #{v}"
-      puts "l_val is #{l_val}"
-      # puts "hearcnt is #{heart_cnt}"
-      # puts "dmnd count is #{dmnd_cnt}"
-      # puts "spade_cnt is #{spade_cnt}"
-      # puts "club_cnt is #{club_cnt}"
-
-      #more_than_1.push(suit_hash.key(v))
-
-      #find out which suit it is
-
-      if v == heart_cnt
-        max_suit = "HEARTS"
-      elsif v == dmnd_cnt
-        max_suit = "DIAMONDS"
-      elsif v == spade_cnt
-        max_suit = "SPADES"
-      elsif v == club_cnt
-        max_suit = "CLUBS"
-      else
-        puts "nothing got done in this v == cnt if"
-      end #case
-    end #if
-  end #each_value
-  puts "max suit in v=l_val if is #{max_suit}"
-  #checked is card that was discarded so if i try to match it to this hand that means checked is player 1 discard so cpu has to match it checked has code so
-  discarded = ""
-  #max_suit = ""
-  cant_discard = false
-  #has all cards that can be discarded
-  cpu_can_discard = []
-  cpu_d_val = ""
-  cpu_d_suit = ""
-
-  @cpu_h_cards.each_with_index do |h, i|
-    if discarded_value == h.fetch("value") || discarded_suit == h.fetch("suit") || h.fetch("value") == "KING" || h.fetch("value") == "ACE"
-      #cookies[:cpu_len] = cpu_hand.length
-      #cookies[:suits_len] = suits.length
-      discarded = h.fetch("code")
-      cpu_can_discard.push(h)
-      cpu_d_val = h.fetch("value")
-      cpu_d_suit = h.fetch("suit")
-    end
-  end
-
-  if cpu_can_discard.length == 0
-    cant_discard = true
-  end
-
-  #if able to discard
-  if cant_discard
-
-    #draw from deck
-    draw_cpu = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=1"
-
-    cpu_draw = api_response(draw_cpu, "cards")
-
-    drawn_cpu_card = ""
-    drawn_cpu_value = ""
-    drawn_cpu_suit = ""
-    cpu_draw.each do |c|
-      drawn_cpu_card = c.fetch("code")
-      drawn_cpu_value = c.fetch("value")
-      drawn_cpu_suit = c.fetch("suit")
-    end
-    puts "drawn cpu card is: #{drawn_cpu_card}"
-
-    pile_name = "cpu_hand"
-    #add to cpu_hand
-    pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + drawn_cpu_card
-    s = api_response(pile, "piles").fetch(pile_name)
-
-    @text.push("\n\nBot draws #{drawn_cpu_value} of #{drawn_cpu_suit}")
-  else # if able to discard check aces, kings
-    #discard card maybe need to put in beginning or osmehting
-
-    #add logic to change king and ace to max suit that means ill have to keep drawing from deck until i find the right one
-    #var to hold discarded king
-    dis_c_king = ""
-    if discarded == "KC" || discarded == "KH" || discarded == "KD" || discarded == "KS"
-      case max_suit
-      when "HEARTS"
-        dis_c_king = "KH"
-      when "DIAMONDS"
-        dis_c_king = "KD"
-      when "SPADES"
-        dis_c_king = "KS"
-      when "CLUBS"
-        dis_c_king = "KC"
-      end
-      puts "max suit in king if is #{max_suit}"
-
-      #draw the king to be changed from discard pile
-      king_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?cards=1"
-      kdc = api_response(king_dc, "cards")[0].fetch("code")
-      while (kdc != dis_c_king)
-
-        #may or may not have to add that discarded card back to deck somehow
-        return_url = "https://deckofcardsapi.com/api/deck/" + deck + "/return/?cards=" + kdc
-        resp = api_response(return_url, "success")
-
-        if api_response(king_dc, "success") == false
-          break #should change to something else or possibly doing something else like i need to check to see if discard pile already uses king or ace so put that condition with if discarded
-        else
-          king_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?cards=1"
-          kdc = api_response(king_dc, "cards")[0].fetch("code")
-
-          pile_name = "discard"
-          pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + kdc
-          res = HTTP.get(pile)
-        end #if to break
-      end
-      #makes it so that bot can discard a king and change it to the suit it has the most cards for
-
-      dis_c_ace = ""
-    elsif discarded == "AC" || discarded == "AH" || discarded == "AD" || discarded == "AS"
-      case max_suit
-      when "HEARTS"
-        dis_c_ace = "AH"
-      when "DIAMONDS"
-        dis_c_ace = "AD"
-      when "SPADES"
-        dis_c_ace = "AS"
-      when "CLUBS"
-        dis_c_ace = "AC"
-      end
-      puts "max suit in ace if is #{max_suit}"
-      draw_4 = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?count=4"
-      draw_4_cards = api_response(draw_4, "cards")
-      pile_name = "hand"
-
-      d4 = []
-      draw_4_cards.each do |d|
-        d4.push(d.fetch("code"))
-      end
-      d4_cards = d4.join(",")
-      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + d4_cards
-      api_response(pile, "piles")
-
-      #draw the ace to be changed from discard pile
-      ace_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?cards=1"
-      adc = api_response(ace_dc, "cards")[0].fetch("code")
-      while (adc != discarded)
-
-        #may or may not have to add that discarded card back to deck somehow
-        return_url = "https://deckofcardsapi.com/api/deck/" + deck + "/return/?cards=" + adc
-        resp = api_response(return_url, "success")
-
-        ace_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?cards=1"
-        adc = api_response(ace_dc, "cards")[0].fetch("code")
-      end
-
-      pile_name = "discard"
-      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + adc
-      res = HTTP.get(pile)
-      #makes it so that bot can discard an ace and change it to the suit it has the most cards for
-
-      # else # discarded card was not a king or ace and that means dont have to do anything special so only have to add discarded
-
-      #   # add the discarded card to discard pile
-      #   pile_name = "discard"
-      #   @cd_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + discarded
-      #   #res = HTTP.get(pile)
-      #   d_cpu_res = api_response(@cd_pile, "piles") #.fetch(pile_name).fetch("cards")
-      # @text.push("\n\nBot discards #{cpu_d_val} of #{cpu_d_suit}")
-      # end
-
-    end
-  end #if statement for aces
-
-  # draw the card from the cpu hand
-  pile_name = "cpu_hand"
-  @ch_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + discarded
-  #res = HTTP.get(pile)
-  re = api_response(@ch_pile, "cards")
-
-  pile_name = "discard"
-  pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + discarded
-  res = HTTP.get(pile)
-
-  pile_name = "cpu_hand"
-  @chl_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
-  @new_cards = api_response(@chl_pile, "piles").fetch(pile_name).fetch("cards")
-
-  #return new_cards
-
-  #for some reason having just the methods here messes up later code for getting the hand pile discard_res
-
-  # end # if with jack/queen
-
-  @new_images = []
-  @new_cards.each do |n|
-    @new_images.push(n.fetch("image"))
-  end
-
-  #************************************************************************************************************************************
 
   pile_name = "hand"
 
@@ -913,6 +511,310 @@ get("/discard") do
 
   parsed_response = JSON.parse(raw_response)
 
+  #not sure where to put this
+  #cpu_discard(discarded_value, discarded_suit)
+  #see if any errors pop up when i just put all the code for cpu discard here *************************************************************
+
+  pile_name = "cpu_hand"
+  pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+  @cpu_h_cards = api_response(pile, "piles").fetch(pile_name).fetch("cards")
+  cpu_cards = cookies[:cpu_cards].split(",")
+
+  #check which cards match what i discarded
+  #cpu_hand = cookies[:cpu_hand].split(",")
+  cpu_h_codes = []
+  cpu_h_vals = []
+  cpu_h_suits = []
+  @cpu_h_cards.each do |c|
+    cpu_h_codes.push(c.fetch("code"))
+    cpu_h_vals.push(c.fetch("value"))
+    cpu_h_suits.push(c.fetch("suit"))
+  end
+  deck = cookies[:deck_id]
+
+  values = cookies[:values].split(",")
+
+  suits = cookies[:suits].split(",")
+
+  # if last discarded card was a jack or queen the cpu skips its turn
+    if discarded_value != "JACK" || discarded_value != "QUEEN" || @is_king
+
+  heart_cnt = 0
+  dmnd_cnt = 0
+  spade_cnt = 0
+  club_cnt = 0
+  #count how many of each suit there is to determine what to change the king/ace into
+
+  cpu_h_suits.each do |s|
+    case s
+    when "HEARTS"
+      heart_cnt += 1
+    when "DIAMONDS"
+      dmnd_cnt += 1
+    when "SPADES"
+      spade_cnt += 1
+    when "CLUBS"
+      club_cnt += 1
+    end
+  end
+
+  suit_hash = { :hearts => heart_cnt, :diamonds => dmnd_cnt, :spades => spade_cnt, :clubs => club_cnt }
+
+  largest = largest_hash_key(suit_hash)
+  l_val = largest[1]
+
+  max_suit = ""
+  more_than_1 = []
+  index = 0
+  suit_hash.each_value do |v|
+
+    #if value in suit hash is equal to the max value of all the counters
+    if v == l_val
+    #  puts "v is #{v}"
+     # puts "l_val is #{l_val}"
+      # puts "hearcnt is #{heart_cnt}"
+      # puts "dmnd count is #{dmnd_cnt}"
+      # puts "spade_cnt is #{spade_cnt}"
+      # puts "club_cnt is #{club_cnt}"
+
+      #more_than_1.push(suit_hash.key(v))
+
+      #find out which suit it is
+
+      if v == heart_cnt
+        max_suit = "HEARTS"
+      elsif v == dmnd_cnt
+        max_suit = "DIAMONDS"
+      elsif v == spade_cnt
+        max_suit = "SPADES"
+      elsif v == club_cnt
+        max_suit = "CLUBS"
+      else
+   #     puts "nothing got done in this v == cnt if"
+      end #case
+    end #if
+  end #each_value
+  #puts "max suit in v=l_val if is #{max_suit}"
+  #checked is card that was discarded so if i try to match it to this hand that means checked is player 1 discard so cpu has to match it checked has code so
+  discarded = ""
+  #max_suit = ""
+  cant_discard = false
+  #has all cards that can be discarded
+  cpu_can_discard = []
+  cpu_d_val = ""
+  cpu_d_suit = ""
+
+  @cpu_h_cards.each_with_index do |h, i|
+    if discarded_value == h.fetch("value") || discarded_suit == h.fetch("suit") || h.fetch("value") == "KING" || h.fetch("value") == "ACE"
+      #cookies[:cpu_len] = cpu_hand.length
+      #cookies[:suits_len] = suits.length
+      discarded = h.fetch("code")
+      cpu_can_discard.push(h)
+      cpu_d_val = h.fetch("value")
+      cpu_d_suit = h.fetch("suit")
+    end
+  end
+
+  if cpu_can_discard.length == 0
+    cant_discard = true
+  end
+
+  #if able to discard
+  if cant_discard
+
+    pile_name = "deck"
+    #draw from deck
+    draw_cpu = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?count=1"
+
+    cpu_draw = api_response(draw_cpu, "cards")
+
+    drawn_cpu_card = ""
+    drawn_cpu_value = ""
+    drawn_cpu_suit = ""
+    cpu_draw.each do |c|
+      drawn_cpu_card = c.fetch("code")
+      drawn_cpu_value = c.fetch("value")
+      drawn_cpu_suit = c.fetch("suit")
+    end
+    #puts "drawn cpu card is: #{drawn_cpu_card}"
+
+    pile_name = "cpu_hand"
+    #add to cpu_hand
+    pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + drawn_cpu_card
+    s = api_response(pile, "piles").fetch(pile_name)
+
+    @text.push("\n\nBot draws #{drawn_cpu_value} of #{drawn_cpu_suit}")
+  else # if able to discard check aces, kings and out side of that discard the card
+    #discard card maybe need to put in beginning or osmehting
+
+    #add logic to change king and ace to max suit that means ill have to keep drawing from deck until i find the right one
+    #var to hold discarded king
+    dis_c_king = ""
+    king_cnt = 0
+    ace_cnt = 0
+    if discarded == "KC" || discarded == "KH" || discarded == "KD" || discarded == "KS"
+      case max_suit
+      when "HEARTS"
+        dis_c_king = "KH"
+      when "DIAMONDS"
+        dis_c_king = "KD"
+      when "SPADES"
+        dis_c_king = "KS"
+      when "CLUBS"
+        dis_c_king = "KC"
+      end
+      puts "max suit in king if is #{max_suit}"
+
+      king_cnt += 1
+
+      #discard discarded from cpu hand in order to return from deck
+      pile_name = "cpu_hand"
+      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + discarded
+      res = HTTP.get(pile)
+
+# return king from cpu hand to deck that way won't be drawing infinite kings and aces nah i need a counter for kings and aces that way ill only return those cards to the deck once enough have been used
+         #return king to deck only if no more using them
+         if king_cnt == 4
+      return_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/return/?cards=" + discarded
+
+      kdc = api_response(return_dc, "cards")[0]
+         
+         else
+          # add discarded back to deck pile to use again
+          pile_name = "deck"
+            deck_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + discarded
+
+      kdc = api_response(deck_dc, "success")
+    
+
+    pile_name = "deck"
+      #draw new king in order to change king suit to max_suit
+      king_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + dis_c_king
+
+      kdc = api_response(king_dc, "cards")[0]
+      kdc_val = kdc.fetch("value")
+      kdc_suit = kdc.fetch("suit")
+
+      #add discarded king that is new to discard
+      pile_name = "discard"
+      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + dis_c_king
+      res = HTTP.get(pile)
+      
+      @text.push("\n\nBot discards #{kdc_val} of #{kdc_suit}")
+
+      
+      end
+      # while (kdc != dis_c_king)
+
+      #   #may or may not have to add that discarded card back to deck somehow
+      #   return_url = "https://deckofcardsapi.com/api/deck/" + deck + "/return/?cards=" + kdc
+      #   resp = api_response(return_url, "success")
+
+      #   if api_response(king_dc, "success") == false
+      #     break #should change to something else or possibly doing something else like i need to check to see if discard pile already uses king or ace so put that condition with if discarded
+      #   else
+      #     king_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/draw/?cards=1"
+      #     kdc = api_response(king_dc, "cards")[0].fetch("code")
+
+      #     pile_name = "discard"
+      #     pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + kdc
+      #     res = HTTP.get(pile)
+      #   end #if to break
+      # end
+      # #makes it so that bot can discard a king and change it to the suit it has the most cards for
+
+      #dis_c_ace = ""
+    elsif discarded == "AC" || discarded == "AH" || discarded == "AD" || discarded == "AS"
+      case max_suit
+      when "HEARTS"
+        dis_c_ace = "AH"
+      when "DIAMONDS"
+        dis_c_ace = "AD"
+      when "SPADES"
+        dis_c_ace = "AS"
+      when "CLUBS"
+        dis_c_ace = "AC"
+      end
+      puts "max suit in ace if is #{max_suit}"
+      pile_name = "deck"
+      draw_4 = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?count=4"
+      draw_4_cards = api_response(draw_4, "cards")
+      
+
+      d4 = []
+      draw_4_cards.each do |d|
+        d4.push(d.fetch("code"))
+      end
+      d4_cards = d4.join(",")
+
+      pile_name = "hand"
+      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + d4_cards
+      api_response(pile, "piles")
+
+     pile_name = "extras"
+      #draw new ace in order to change ace suit to max_suit
+      ace_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + dis_c_ace
+
+      adc = api_response(ace_dc, "cards")[0]
+
+      adc_val = adc.fetch("value")
+      adc_suit = adc.fetch("suit")
+
+      pile_name = "discard"
+      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + dis_c_ace
+      res = HTTP.get(pile)
+      #makes it so that bot can discard an ace and change it to the suit it has the most cards for
+
+      # else # discarded card was not a king or ace and that means dont have to do anything special so only have to add discarded
+
+      #   # add the discarded card to discard pile
+      #   pile_name = "discard"
+      #   @cd_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + discarded
+      #   #res = HTTP.get(pile)
+      #   d_cpu_res = api_response(@cd_pile, "piles") #.fetch(pile_name).fetch("cards")
+       @text.push("\n\nBot discards #{adc_val} of #{adc_suit}")
+      # end
+
+    end #if statement for aces
+
+    #in else for cant discard so that means able to discard here
+
+    # draw the card from the cpu hand
+  pile_name = "cpu_hand"
+  @ch_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + discarded
+  #res = HTTP.get(pile)
+  re = api_response(@ch_pile, "cards")
+
+  pile_name = "discard"
+  pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + discarded
+  res = HTTP.get(pile)
+
+  @text.push("\n\nBot discards #{cpu_d_val} of #{cpu_d_suit}")
+  end #if for can't discard
+
+  
+
+  pile_name = "cpu_hand"
+  @chl_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+  @new_cards = api_response(@chl_pile, "piles").fetch(pile_name).fetch("cards")
+
+  #return new_cards
+
+  #for some reason having just the methods here messes up later code for getting the hand pile discard_res
+
+  # end # if with jack/queen
+
+  @new_images = []
+  @new_cards.each do |n|
+    @new_images.push(n.fetch("image"))
+  end
+end
+  #************************************************************************************************************************************
+
+
+
+
+
   pile_name = "discard"
 
   pile_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
@@ -935,6 +837,8 @@ get("/discard") do
   end
 
   ################################## #################  end of discard pile
+
+
 
   ################################################### start of disabled logic
   #pile name is currently discard
