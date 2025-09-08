@@ -32,7 +32,7 @@
 
         <ul>
           <li><input type="checkbox" id="card<%= i %>" name="<%= @hand_code[i] %>" class="disabled" disabled />
-            <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>" class="disabled"  /></label>
+            <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i %>" class="disabled"  /></label>
           </li>
         </ul>
 
@@ -40,8 +40,9 @@
         <ul>
 
           <li><input type="checkbox" id="card<%= i %>" name="<%= @hand_code[i] %>" />
-            <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>"  /></label>
+            <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= @hand_code[i] %>"  /></label>
           </li>
+          <button id = "king_button"> </button>
 
         </ul>
       <% end %> <!-- end of if -->
