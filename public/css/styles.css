@@ -123,3 +123,12 @@ label img {
   background-color: lightblue;
   padding: 20px;
 }
+
+#king_button {
+  display: none;
+}
+
+:checked + #cKH, #cKD, #cKS, #cKC ~ #king_button {
+  display:block;
+
+}
