@@ -1,24 +1,26 @@
 html {
-    min-height: 100%;
-  }  
+  min-height: 100%;
+}
 
-  body {
-    min-height: 100%;
-    padding: 40px 0;
+body {
+  min-height: 100%;
+  padding: 40px 0;
   /*  background: linear-gradient(90deg, #003f5b, #00405d, #004b66, #006978, #009d6c, #00b640, #42bd13, #49be00); /* made at https://learnui.design/tools/gradient-generator.html */
-    color: rgba(17, 17, 17, 1.0);
-    font-family: 'Lora', serif;
-    
-  }
+  color: rgba(17, 17, 17, 1.0);
+  font-family: 'Lora', serif;
 
-div{ /*just for effect*/ 
-  border:1px solid brown; 
-  display:inline-block;
+}
+
+div {
+  /*just for effect*/
+  border: 1px solid brown;
+  display: inline-block;
   padding: 40px 40px;
 }
-img{
-  cursor:pointer;
-  text-decoration:underline;
+
+img {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 ul {
@@ -26,19 +28,19 @@ ul {
 }
 
 li {
-  display:block;
+  display: block;
 }
 
-input[type='checkbox'] { 
+input[type='checkbox'] {
 
-/*  padding: 50px;
+  /*  padding: 50px;
 
   height: 50px;
   */
-  display:none;
- }
+  display: none;
+}
 
- label {
+label {
   border: 1px solid #fff;
   padding: 10px;
   display: block;
@@ -72,17 +74,17 @@ label img {
   transform-origin: 50% 50%;
 }
 
-:checked + label {
+:checked+label {
   border-color: #ddd;
 }
 
-:checked + label:before {
+:checked+label:before {
   content: "✓";
   background-color: grey;
   transform: scale(1);
 }
 
-:checked + label img {
+:checked+label img {
   transform: scale(0.9);
   box-shadow: 0 0 5px #333;
   z-index: -1;
@@ -90,19 +92,19 @@ label img {
 
 .disabled {
   border: solid;
-  
-  border-color:rgb(165, 42, 42);
-  
+
+  border-color: rgb(165, 42, 42);
+
 }
 
 #next_draw {
-  display:none;
- 
+  display: none;
+
 }
 
 #king_disc {
-  display:none;
- 
+  display: none;
+
 }
 
 .discard {
@@ -114,23 +116,46 @@ label img {
   width: 300px;
   height: 200px;
   border: 1px solid #ccc;
-  overflow: auto; /* Adds scrollbars only when content overflows */
+  overflow: auto;
+  /* Adds scrollbars only when content overflows */
   padding: 10px;
 }
+
 .long-content {
-  width: 400px; /* Wider than container */
-  height: 300px; /* Taller than container */
+  width: 400px;
+  /* Wider than container */
+  height: 300px;
+  /* Taller than container */
   background-color: lightblue;
   padding: 20px;
 }
 
 .king_btns {
-  display:none;
+  display: none;
+
+}
+
+:checked+label img[id="cKH"]~.king_btns,
+:checked+label img[id="cKD"]~.king_btns,
+:checked+label img[id="cKS"]~.king_btns,
+:checked+label img[id="cKC"]~.king_btns {
+  display: block;
+
+  /* try to make cropping work */
+  width: 70px;
+  height: 30px;
+overflow:hidden;
   
 }
 
-:checked + label img[id="cKH"] ~ .king_btns, :checked + label img[id="cKD"] ~ .king_btns, :checked + label img[id="cKS"] ~ .king_btns, :checked + label img[id="cKC"] ~ .king_btns {
-  display:block;
+:checked+label img[id="cKH"]~.king_btns img,
+:checked+label img[id="cKD"]~.king_btns img,
+:checked+label img[id="cKS"]~.king_btns img,
+:checked+label img[id="cKC"]~.king_btns img {
+  width: 74px;
+  height: 32px;
+  /* width: auto;
+  height: auto; */
+margin: -5px 0 0 -10px;
 
 }
-
