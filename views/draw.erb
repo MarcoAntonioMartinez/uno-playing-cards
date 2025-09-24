@@ -1,4 +1,25 @@
 <form action="/discard">
+  
+  <div class="scroll-container">
+    
+  <div class="long-content">
+   <%  @text.each do |c| %>
+    <p> <%= c %> </p>
+    <%end%>
+  </div>
+
+  </div>
+
+  
+  <div>
+    <h2> op's hand</h2>
+    <% @new_images.each_with_index do |c,i| %>
+      <input type="checkbox" id="op<%= i %>" name="op<%= i %>" />
+      <label for="op<%= i %>"   id="op<%= i+1 %>"  > <img src="<%= c %>"/> </label>
+
+    <% end %>
+  </div>
+
   <div>
     <h2> Your hand</h2>
 
@@ -38,26 +59,22 @@
 
   <div>
     <h2> Discard pile</h2>
-<% @discard_arr.each_with_index do |c, i| %>
-<img src="<%= c %>" id="d<%= i+1 %>"  /></label>
-<% end %> <!-- end of loop -->
-  </div>
-
-
-
-
+    <% @discard_arr.each_with_index do |c, i| %>
+    <label>  <img src="<%= c %>" id="d<%= i+1 %>"  /></label>
+  <% end %> <!-- end of loop -->
+</div>
 
 <% if @disable_button%>
-<button disabled> discard</button>
-<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+  <button disabled> discard</button>
+  <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
     <img src="https://deckofcardsapi.com/static/img/back.png"  />
   </label>
-  <% else %>
-<button> discard</button>
-<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+<% else %>
+  <button> discard</button>
+  <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
     <img src="https://deckofcardsapi.com/static/img/back.png"  />
   </label>
 
-  <% end %>
-  
+<% end %>
+
 </form>
