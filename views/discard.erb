@@ -1,6 +1,7 @@
 <form action="/discard">
 
-<div class="scroll-container">
+  <div class="scroll-container">
+    
   <div class="long-content">
    <%  @text.each do |c| %>
     <p> <%= c %> </p>
@@ -9,22 +10,17 @@
 
   </div>
 
-
-<div>
-  <h2> op's hand</h2>
- 
-  <% @new_images.each_with_index do |c,i| %>
+  <div>
+    <h2> op's hand</h2>
+<% @new_images.each_with_index do |c,i| %>
 <input type="checkbox" id="op<%= i %>" name="op<%= i %>" />
           <label for="op<%= i %>"   id="op<%= i+1 %>"  > <img src="<%= c %>"/> </label>
           
           <% end %>
-</div>
+  </div>
 
-
-
-<div>
-<h2> Your hand</h2>
- 
+  <div>
+    <h2> Your hand</h2>
 
     <% @hand_arr.each_with_index do |c, i| %>
 
@@ -40,9 +36,14 @@
         <ul>
 
           <li><input type="checkbox" id="card<%= i %>" name="<%= @hand_code[i] %>" />
-            <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= @hand_code[i] %>"  /></label>
+            <label for="card<%= i %>" >
+              <img src="<%= c %>" id="c<%= @hand_code[i] %>"  />
+              <button id="ks_button" name="king" value="KS" class="king_btns"> </button>
+              <button id="kc_button" name="king" value="KC" class="king_btns"> </button>
+              <button id="kh_button" name="king" value="KH" class="king_btns"> </button>
+              <button id="kd_button" name="king" value="KD" class="king_btns">  </button>
+            </label>
           </li>
-          <button id = "king_button"> </button>
 
         </ul>
       <% end %> <!-- end of if -->
@@ -51,8 +52,8 @@
 </div>
 
 <div>
-<h2> Discard pile</h2>
-<!--
+  <h2> Discard pile</h2>
+  <!--
 <h2> new_king is < %= @new_king % > </h2>
 <h2> new_king is < % = @in_king % > </h2>
 <h2> top discard is < % = @top_discard % > </h2>
@@ -61,54 +62,28 @@
 <h2> pile is:  <%= @pile %> </h2>
 <h2> new_king is <%= @new_king %> </h2>
 -->
-<ul>
-<% @pile_arr.each_with_index do |c, i| %>
+  <ul>
+    <% @pile_arr.each_with_index do |c, i| %>
 
-<li>  <label>
-   <img src="<%= c %>" id="<%= @code_arr[i] %>"  /></label>
-</li>
+      <li>  <label>
+          <img src="<%= c %>" id="<%= @code_arr[i] %>"  /></label>
+      </li>
 
-<% end %>
-</ul>
+    <% end %>
+  </ul>
 
+  <!-- king array goes here if i still need it -->
 
-
-
-<h2> <%= @discard %> </h2>
-<h2> pile is:  <%= @pile %> </h2>
-<h2> new_king is <%= @new_king %> </h2>
-
-<ul>
-<% if @is_king  %>
-<% @king_arr.each_with_index do |c, i| %>
-
-
-
-<label for="king_disc<%= i %>" id="king_disc_img<%= i %>"> <button formaction="/discard/king" type="submit" id="king_disc<%= i %>" name="king" value="<%= @king_codes[i] %>"> </button>
-    <img src=" <%= c %>"  />
-  </label>
-
-
-<% end %>
-
-<% end %>
-</div>
-
-
-
-
-
-
-<% if @disable_button%>
-<button disabled> discard</button>
-<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
-    <img src="https://deckofcardsapi.com/static/img/back.png"  />
-  </label>
+  <% if @disable_button%>
+    <button disabled> discard</button>
+    <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+      <img src="https://deckofcardsapi.com/static/img/back.png"  />
+    </label>
   <% else %>
-<button> discard</button>
-<label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
-    <img src="https://deckofcardsapi.com/static/img/back.png"  />
-  </label>
+    <button> discard</button>
+    <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+      <img src="https://deckofcardsapi.com/static/img/back.png"  />
+    </label>
 
   <% end %>
 </form>
