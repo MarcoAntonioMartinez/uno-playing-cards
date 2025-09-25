@@ -123,11 +123,18 @@ def cpu()
     # puts "values is #{values}"
   end
 
-  session[:cpu_card] = (@cpu_card_arr.join(","))
+  cookies[:cpu_cards] = (@cpu_card_arr.join(","))
 
-  session[:cpu_code] = @cpu_code_arr.join(",")
-  session[:values] = (values.join(","))
-  session[:suits] = (suits.join(","))
+  cookies[:cpu_codes] = @cpu_code_arr.join(",")
+  cookies[:cpu_values] = (values.join(","))
+  cookies[:cpu_suits] = (suits.join(","))
+
+  puts cookies[:cpu_cards].split(",")  
+
+  puts cookies[:cpu_codes].split(",")  
+  puts cookies[:cpu_values].split(",")  
+  puts cookies[:cpu_suits].split(",")  
+
 
   cpu_hand = @cpu_code_arr.join(",")
   pile_name = "cpu_hand"
@@ -144,7 +151,7 @@ def cpu()
 
   #scrapping this idea for now # add all values to array and iterate by 4s to get next one 0 is code 4 is next code
   # cpu_hand = []
-  cpu_codes
+  
 
   cards_res.each do |c|
     @c_image.push(c.fetch("image"))
@@ -154,7 +161,7 @@ def cpu()
     # cpu_hand.push(c.fetch("code") + "," + c.fetch("image") + "," + c.fetch("value") + "," + c.fetch("suit"))
   end
 
-  puts cpu_hand
+  # puts cpu_hand
 #try to turn array into json to store in session
  
 ################################################### end of making cpu hand
@@ -168,26 +175,32 @@ def cpu_action(value, suit)
   #see if any errors pop up when i just put all the code for cpu discard here *************************************************************
   deck = cookies[:deck_id]
 
-  pile_name = "cpu_hand"
-  pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
-  @cpu_h_cards = api_response(pile, "piles").fetch(pile_name).fetch("cards")
-  # cpu_cards = cookies[:cpu_cards].split(",")
+  # pile_name = "cpu_hand"
+  # pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+  # @cpu_h_cards = api_response(pile, "piles").fetch(pile_name).fetch("cards")
+  # # cpu_cards = cookies[:cpu_cards].split(",")
 
   #check which cards match what i discarded
   #cpu_hand = cookies[:cpu_hand].split(",")
-  cpu_h_codes = []
+  # cpu_h_codes = []
   cpu_h_vals = []
   cpu_h_suits = []
-  @cpu_h_cards.each do |c|
-    cpu_h_codes.push(c.fetch("code"))
-    cpu_h_vals.push(c.fetch("value"))
-    cpu_h_suits.push(c.fetch("suit"))
-  end
+  # do i need these if i already have session values to use?
+  # @cpu_h_cards.each do |c|
+  #   cpu_h_codes.push(c.fetch("code"))
+  #   cpu_h_vals.push(c.fetch("value"))
+  #   cpu_h_suits.push(c.fetch("suit"))
+  # end
   deck = cookies[:deck_id]
 
-  values = cookies[:values].split(",")
 
-  suits = cookies[:suits].split(",")
+  @cpu_h_cards = cookies[:cpu_cards].split(",")
+
+  cpu_h_codes = cookies[:cpu_codes].split(",")
+
+  values = cookies[:cpu_values].split(",")
+
+  suits = cookies[:cpu_suits].split(",")
 
   #variable true if cpu has discarded all necessary cards
   has_discarded = false
@@ -279,12 +292,23 @@ def cpu_action(value, suit)
     cpu_d_val = ""
     cpu_d_suit = ""
 
-    @cpu_h_cards.each_with_index do |h, i|
-      if value == h.fetch("value") || suit == h.fetch("suit") || h.fetch("value") == "KING" || h.fetch("value") == "ACE"
-        discarded = h.fetch("code")
-        cpu_can_discard.push(h)
-        cpu_d_val = h.fetch("value")
-        cpu_d_suit = h.fetch("suit")
+    # @cpu_h_cards.each_with_index do |h, i|
+    #   if value == h.fetch("value") || suit == h.fetch("suit") || h.fetch("value") == "KING" || h.fetch("value") == "ACE"
+    #     discarded = h.fetch("code")
+    #     cpu_can_discard.push(h)
+    #     cpu_d_val = h.fetch("value")
+    #     cpu_d_suit = h.fetch("suit")
+    #   end
+    # end
+
+    # changed to have session values
+    cpu_h_codes.each_with_index do |c, i|
+      if value == values[i] || suit == suits[i] || values[i] == "KING" || values[i] == "ACE"
+        discarded = c
+        puts "discarded is " + discarded
+        cpu_can_discard.push(c)
+        cpu_d_val = values[i]
+        cpu_d_suit = suits[i]
       end
     end
 
@@ -306,12 +330,20 @@ def cpu_action(value, suit)
       drawn_cpu_card = ""
       drawn_cpu_value = ""
       drawn_cpu_suit = ""
+      drawn_cpu_img = ""
       cpu_draw.each do |c|
         drawn_cpu_card = c.fetch("code")
         drawn_cpu_value = c.fetch("value")
         drawn_cpu_suit = c.fetch("suit")
+        drawn_cpu_img = c.fetch("image")
       end
       #puts "drawn cpu card is: #{drawn_cpu_card}"
+
+      #update cpu hand
+      cpu_h_codes.push(drawn_cpu_card)
+      values.push(drawn_cpu_value)
+      suits.push(drawn_cpu_suit)
+      @cpu_h_cards.push(drawn_cpu_img)
 
       pile_name = "cpu_hand"
       #add to cpu_hand
@@ -353,6 +385,28 @@ def cpu_action(value, suit)
         pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + discarded
         res = HTTP.get(pile)
 
+        #update cpu_hand
+        #find index of code discarded
+        #set that index to next card until every card is updated to new index basically every card moves up one index
+        # that should be end of updating after updating every array -> now i remember why i thought this wouldnt work, so many arrays here would changing to hash somehow work?
+        #try .select! to change array like that
+
+        #got index of discarded
+        disc_index = cpu_h_codes.index(discarded)
+puts "cpu hand code at discarded is " + cpu_h_codes[disc_index]
+        #.select! to remove discarded from codes
+        cpu_h_codes.select! {|code| code != discarded }
+
+        #.select! to remove discarded from cards
+@cpu_h_cards.select! {|card| @cpu_h_cards.index(card) != disc_index }
+
+        #.select! to remove discarded from suits
+suits.select! {|suit| suits.index(suit) != disc_index }
+
+        #.select! to remove discarded from values
+values.select! {|val| values.index(val) != disc_index }
+
+
         #set to true because now discarded cant be drawn again
         # has_discarded = true
 
@@ -374,8 +428,17 @@ def cpu_action(value, suit)
           # make sure not trying to draw and discard same card again
           if (discarded != dis_c_king)
             
-           
+            n_king_in_hand_arr = []
+           if @hand_arr != nil 
+
+            
+            n_king_in_hand_arr.push(@hand_arr[@hand_arr.index(dis_c_king)])
             #see if player hand does not have king that cpu needs to discard
+
+           elsif @hand != nil #should be when @hand is not nil
+            n_king_in_hand_arr.push(@hand[@hand.index(dis_c_king)])
+
+
             if n_king_in_hand_arr != nil 
               pile_name = "hand"
               p_h = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + dis_c_king
@@ -391,7 +454,7 @@ def cpu_action(value, suit)
               else
                 session[:text] =  @text.join(",")
               end
-            else
+            else # i think i need to change this else to be drawing card from player hand
               pile_name = "deck"
               #draw new king in order to change king suit to max_suit
               king_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + dis_c_king
@@ -417,6 +480,7 @@ def cpu_action(value, suit)
                 @text.push("\n\nBot discards #{kdc_val} of #{kdc_suit}")
               end # session text
             end # check for changed card being held in hand ; might need to do the same for discard pile unless im doing it elsewhere
+          end # if n_king_in_hand
           end # if discarded ! = dis_c_king
         end # king cnt maybe its switched around
       elsif discarded == "AC" || discarded == "AH" || discarded == "AD" || discarded == "AS"
@@ -432,6 +496,21 @@ def cpu_action(value, suit)
         end
 
         ace_cnt += 1
+
+         #got index of discarded
+        disc_index = cpu_h_codes.index(discarded)
+
+        #.select! to remove discarded from codes
+        cpu_h_codes.select! {|code| code != discarded }
+
+        #.select! to remove discarded from cards
+@cpu_h_cards.select! {|card| @cpu_h_cards.index(card) != disc_index }
+
+        #.select! to remove discarded from suits
+suits.select! {|suit| suits.index(suit) != disc_index }
+
+        #.select! to remove discarded from values
+values.select! {|val| values.index(val) != disc_index }
 
         if ace_cnt == 4
           return_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/return/?cards=" + discarded
@@ -496,6 +575,20 @@ def cpu_action(value, suit)
         @ch_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + discarded
         #res = HTTP.get(pile)
 
+                 #got index of discarded
+        disc_index = cpu_h_codes.index(discarded)
+
+        #.select! to remove discarded from codes
+        cpu_h_codes.select! {|code| code != discarded }
+puts "codes after select are #{cpu_h_codes}"
+        #.select! to remove discarded from cards
+@cpu_h_cards.select! {|card| @cpu_h_cards.index(card) != disc_index }
+
+        #.select! to remove discarded from suits
+suits.select! {|suit| suits.index(suit) != disc_index }
+
+        #.select! to remove discarded from values
+values.select! {|val| values.index(val) != disc_index }
          
 
         pile_name = "discard"
@@ -503,8 +596,13 @@ def cpu_action(value, suit)
         res = HTTP.get(pile)
 
         if session[:text] != nil
+          if session[:text].is_a?(String)
           @text.push("\n\nBot discards #{cpu_d_val} of #{cpu_d_suit}")
-          session[:text] = session[:text].join(",") + "," + @text.join(",")
+          session[:text] = session[:text]  + "," + @text.join(",")
+          elsif session[:text].is_a?(Array)
+            @text.push("\n\nBot discards #{cpu_d_val} of #{cpu_d_suit}")
+          session[:text] = session[:text].join(",")  + "," + @text.join(",")
+          end
         else
           @text.push("\n\nBot discards #{cpu_d_val} of #{cpu_d_suit}")
         end
@@ -527,18 +625,31 @@ def cpu_action(value, suit)
   @chl_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
   @new_cards = api_response(@chl_pile, "piles").fetch(pile_name).fetch("cards")
 
-  @new_images = []
-  @new_cards.each do |n|
-    @new_images.push(n.fetch("image"))
-  end #end loop
+  cookies[:cpu_cards] = @cpu_h_cards.join(",")
+  cookies[:cpu_codes] = cpu_h_codes.join(",")
+  cookies[:cpu_suits] = suits.join(",")
+  cookies[:cpu_values] = values.join(",")
+  
+  # @new_images = []
+  # @new_cards.each do |n|
+  #   @new_images.push(n.fetch("image"))
+  # end #end loop
+
+  
+
 end #end function
 
 get("/") do
+  # session.clear
   erb(:home)
 end
 
 get("/game") do
 
+  #clear session if it hasnt already been cleared
+#   if session != {}
+#   session.clear
+# end
   #make sure to reset king counter everytime new game starts
   cookies[:king_cnt] = 0
 
@@ -948,9 +1059,17 @@ get("/discard") do
 
   #last place @text was in
 #join text add to cookies and split and assign in draw
+ # try making @text "global"
+if session[:text] != nil
+  @text.push(session[:text])
+@text.push("You discarded the #{discarded_value} of #{discarded_suit}")
+  session[:text] = @text.join(",")
+puts session[:text]
+else
   @text.push("You discarded the #{discarded_value} of #{discarded_suit}")
-  session[:text] = @text
-
+  session[:text] = @text.to_s
+  puts session[:text]
+end
   #end of if for checking king was selected already discarding that card so else is when discarding other cards
 
   #not sure where to put this
