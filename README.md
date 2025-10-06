@@ -20,5 +20,5 @@ end
 Some rights reserved — see [LICENSE.txt](LICENSE.txt)
 
 <!--
- this version is more up to date and is before i put the selects for the cpu hand
+ this version is more up to date and is after i put the selects for the cpu hand
  -->
