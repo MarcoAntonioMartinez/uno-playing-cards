@@ -13,7 +13,7 @@
   
   <div>
     <h2> op's hand</h2>
-    <% @cpu_h_cards.each_with_index do |c,i| %>
+    <% @new_images.each_with_index do |c,i| %>
       <input type="checkbox" id="op<%= i %>" name="op<%= i %>" />
       <label for="op<%= i %>"   id="op<%= i+1 %>"  > <img src="<%= c %>"/> </label>
 
@@ -59,7 +59,7 @@
 
   <div>
     <h2> Discard pile</h2>
-    <% @discard_arr.each_with_index do |c, i| %>
+    <% @discard_pile.each_with_index do |c, i| %>
     <label>  <img src="<%= c %>" id="d<%= i+1 %>"  /></label>
   <% end %> <!-- end of loop -->
 
