@@ -130,15 +130,15 @@ label img {
   padding: 20px;
 }
 
-.king_btns {
+.suit_btns {
   display: none;
 
 }
 
-:checked+label img[id="cKH"]~.king_btns,
-:checked+label img[id="cKD"]~.king_btns,
-:checked+label img[id="cKS"]~.king_btns,
-:checked+label img[id="cKC"]~.king_btns {
+:checked+label img[id="cKH"]~.suit_btns,
+:checked+label img[id="cKD"]~.suit_btns,
+:checked+label img[id="cKS"]~.suit_btns,
+:checked+label img[id="cKC"]~.suit_btns {
   display: block;
 
   /* try to make cropping work */
@@ -148,10 +148,36 @@ overflow:hidden;
   
 }
 
-:checked+label img[id="cKH"]~.king_btns img,
-:checked+label img[id="cKD"]~.king_btns img,
-:checked+label img[id="cKS"]~.king_btns img,
-:checked+label img[id="cKC"]~.king_btns img {
+:checked+label img[id="cKH"]~.suit_btns img,
+:checked+label img[id="cKD"]~.suit_btns img,
+:checked+label img[id="cKS"]~.suit_btns img,
+:checked+label img[id="cKC"]~.suit_btns img {
+  width: 74px;
+  height: 32px;
+  /* width: auto;
+  height: auto; */
+margin: -5px 0 0 -10px;
+
+}
+
+
+:checked+label img[id="cAH"]~.suit_btns,
+:checked+label img[id="cAD"]~.suit_btns,
+:checked+label img[id="cAS"]~.suit_btns,
+:checked+label img[id="cAC"]~.suit_btns {
+  display: block;
+
+  /* try to make cropping work */
+  width: 70px;
+  height: 30px;
+overflow:hidden;
+  
+}
+
+:checked+label img[id="cAH"]~.suit_btns img,
+:checked+label img[id="cAD"]~.suit_btns img,
+:checked+label img[id="cAS"]~.suit_btns img,
+:checked+label img[id="cAC"]~.suit_btns img {
   width: 74px;
   height: 32px;
   /* width: auto;
