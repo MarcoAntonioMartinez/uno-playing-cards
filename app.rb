@@ -3,6 +3,7 @@ require "sinatra/reloader"
 require "http"
 require "json"
 require "sinatra/contrib"
+require "uri"
 require_relative "hand"
 
 # idk if i should go and replace the code with this function now or later ill find out i guess
@@ -129,11 +130,11 @@ def cpu()
   cookies[:cpu_values] = (values.join(","))
   cookies[:cpu_suits] = (suits.join(","))
 
-  puts cookies[:cpu_cards].split(",")
+  # puts cookies[:cpu_cards].split(",")
 
-  puts cookies[:cpu_codes].split(",")
-  puts cookies[:cpu_values].split(",")
-  puts cookies[:cpu_suits].split(",")
+  # puts cookies[:cpu_codes].split(",")
+  # puts cookies[:cpu_values].split(",")
+  # puts cookies[:cpu_suits].split(",")
 
   cpu_hand = @cpu_code_arr.join(",")
   pile_name = "cpu_hand"
@@ -164,7 +165,7 @@ def cpu()
 
   ################################################### end of making cpu hand
   #  return cards_res
-
+  cookies[:cpu_turns] = 0
 end
 
 ####################################################################################################################
@@ -176,14 +177,13 @@ def cpu_action(value, suit)
   pile_name = "cpu_hand"
   pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
   @cpu_h_cards = api_response(pile, "piles").fetch(pile_name).fetch("cards")
-  
 
-  
-  
   cpu_h_codes = []
   # cpu_h_vals = []
   # cpu_h_suits = []
-  
+  values = []
+  suits = []
+
   @cpu_h_cards.each do |c|
     cpu_h_codes.push(c.fetch("code"))
     # cpu_h_vals.push(c.fetch("value"))
@@ -210,6 +210,8 @@ def cpu_action(value, suit)
   session[:jack_used] = false
   session[:queen_used] = false
 
+  session[:player_turn] = true
+
   # array that has aces in it
   ace_arr = [
     "https://deckofcardsapi.com/static/img/AS.png", "https://deckofcardsapi.com/static/img/AC.png", "https://deckofcardsapi.com/static/img/AD.png", "https://deckofcardsapi.com/static/img/AH.png",
@@ -218,10 +220,34 @@ def cpu_action(value, suit)
   # array that has kings in it
   king_arr = ["https://deckofcardsapi.com/static/img/KS.png", "https://deckofcardsapi.com/static/img/KC.png", "https://deckofcardsapi.com/static/img/KD.png", "https://deckofcardsapi.com/static/img/KH.png"]
 
+  spade_indx = 0
+  clubs_indx = 1
+  diamond_indx = 2
+  heart_indx = 3
+
+  cookies[:king_arr] = king_arr.join(",")
+  cookies[:ace_arr] = ace_arr.join(",")
+
+  @cpu_discarded = true
+
+  # cpu_turns
+  # cpu_turns = 1
+
+  cpu_turns = cookies[:cpu_turns].to_i
+
+  if cpu_turns == 3
+    session[:player_turn] = false
+  end
+
+  puts session[:player_turn].class
+
+  return if cpu_turns > 3
+
   # puts "Jack used before if val == jack is #{session[:jack_used]}"
   # puts "Queen used before if val == jack is #{session[:queen_used]}"
   # if last discarded card was a jack or queen the cpu skips its turn
-  if (value == "JACK" || value == "QUEEN" && jq_cnt != 1)
+  if ((value == "JACK" || value == "QUEEN") && session[:player_turn] == true)
+
     # if session[:jack_used] != true || session[:queen_used] != true
     puts "this should be the only thing that happens and new cards are still available for cpu_action"
     # @text.push("Player discarded a #{value}, skipping the CPU's turn.")
@@ -311,7 +337,7 @@ def cpu_action(value, suit)
     # cpu_h_codes.each_with_index do |c, i|
     #   if value == values[i] || suit == suits[i] || values[i] == "KING" || values[i] == "ACE"
     #     discarded = c
-       
+
     #     cpu_can_discard.push(c)
     #     cpu_d_val = values[i]
     #     cpu_d_suit = suits[i]
@@ -325,6 +351,9 @@ def cpu_action(value, suit)
       cant_discard = true
     end
 
+    # make array for discard pile
+    # discard_pile = cookies[:discard_pile].split(",")
+    @discard_pile ||= cookies[:discard_pile]&.split(",") || []
     #if not able to discard
     if cant_discard
       pile_name = "deck"
@@ -334,8 +363,8 @@ def cpu_action(value, suit)
       cpu_draw = api_response(draw_cpu, "cards")[0]
 
       drawn_cpu_card = cpu_draw.fetch("code")
-drawn_cpu_value = cpu_draw.fetch("value")
-        drawn_cpu_suit = cpu_draw.fetch("suit")
+      drawn_cpu_value = cpu_draw.fetch("value")
+      drawn_cpu_suit = cpu_draw.fetch("suit")
 
       # drawn_cpu_card = ""
       # drawn_cpu_value = ""
@@ -360,11 +389,13 @@ drawn_cpu_value = cpu_draw.fetch("value")
       pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + drawn_cpu_card
       s = api_response(pile, "piles").fetch(pile_name)
 
+      # to prevent card from being discarded if cpu has drawn a card
+      # has_discarded = true
       # if session[:text] != nil
-        @text.push("\n\nCPU draws #{drawn_cpu_value} of #{drawn_cpu_suit}")
-        # session[:text] = session[:text] + "," + @text.join(",")
+      @text.push("\n\nCPU draws #{drawn_cpu_value} of #{drawn_cpu_suit}")
+      # session[:text] = session[:text] + "," + @text.join(",")
       # else
-        # session[:text] = @text.join(",")
+      # session[:text] = @text.join(",")
       # end
     else # if able to discard check aces, kings and out side of that discard the card
       #discard card maybe need to put in beginning or osmehting
@@ -372,25 +403,30 @@ drawn_cpu_value = cpu_draw.fetch("value")
       #add logic to change king and ace to max suit that means ill have to keep drawing from deck until i find the right one
       #var to hold discarded king
       dis_c_king = ""
-
+      king_img = ""
       if discarded == "KC" || discarded == "KH" || discarded == "KD" || discarded == "KS"
+        dis_king_val = "KING"
         case max_suit
         when "HEARTS"
           dis_c_king = "KH"
-          dis_king_val = "KING"
+
           dis_king_suit = "HEARTS"
+          king_img = king_arr[heart_indx]
         when "DIAMONDS"
           dis_c_king = "KD"
-          dis_king_val = "KING"
+
           dis_king_suit = "DIAMONDS"
+          king_img = king_arr[diamond_indx]
         when "SPADES"
           dis_c_king = "KS"
-          dis_king_val = "KING"
+
           dis_king_suit = "SPADES"
+          king_img = king_arr[spade_indx]
         when "CLUBS"
           dis_c_king = "KC"
-          dis_king_val = "KING"
+
           dis_king_suit = "CLUBS"
+          king_img = king_arr[clubs_indx]
         end
         puts "max suit in king if is #{max_suit}"
 
@@ -401,86 +437,97 @@ drawn_cpu_value = cpu_draw.fetch("value")
 
         #update cpu_hand
 
-   
-#set to true because now discarded cant be drawn again
+        #set to true because now discarded cant be drawn again
         # has_discarded = true
 
         has_discarded = true
 
-        # make sure not trying to draw and discard same card again
-        if (discarded != dis_c_king)
-          # n_king_in_hand_arr = []
-          # if @hand_arr != nil
-          #   n_king_in_hand_arr.push(@hand_arr[@hand_arr.index(dis_c_king)])
-          #   #see if player hand does not have king that cpu needs to discard
+        # # make sure not trying to draw and discard same card again
+        # if (discarded != dis_c_king)
+        # n_king_in_hand_arr = []
+        # if @hand_arr != nil
+        #   n_king_in_hand_arr.push(@hand_arr[@hand_arr.index(dis_c_king)])
+        #   #see if player hand does not have king that cpu needs to discard
 
-          # elsif @hand != nil #should be when @hand is not nil
-          #   n_king_in_hand_arr.push(@hand[@hand.index(dis_c_king)])
+        # elsif @hand != nil #should be when @hand is not nil
+        #   n_king_in_hand_arr.push(@hand[@hand.index(dis_c_king)])
 
-          #      pile_name = "discard"
-          #     pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + dis_c_king
-          #     res = HTTP.get(pile)
+        #      pile_name = "discard"
+        #     pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + dis_c_king
+        #     res = HTTP.get(pile)
 
-          #     @text.push("\n\nCPU discards #{kdc_val} of #{kdc_suit}")
-          #     if session[:text] != nil
-          #       session[:text] = session[:text].join(",") + "," + @text.join(",")
-          #     else
-          #       session[:text] = @text.join(",")
-          #     end
-          #   else # i think i need to change this else to be drawing card from player hand
-          # pile_name = "deck"
-          # #draw new king in order to change king suit to max_suit
-          # king_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + dis_c_king
+        #     @text.push("\n\nCPU discards #{kdc_val} of #{kdc_suit}")
+        #     if session[:text] != nil
+        #       session[:text] = session[:text].join(",") + "," + @text.join(",")
+        #     else
+        #       session[:text] = @text.join(",")
+        #     end
+        #   else # i think i need to change this else to be drawing card from player hand
+        # pile_name = "deck"
+        # #draw new king in order to change king suit to max_suit
+        # king_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + dis_c_king
 
-          # kdc = api_response(king_dc, "cards")[0]
-          # kdc_val = kdc.fetch("value")
-          # kdc_suit = kdc.fetch("suit")
+        # kdc = api_response(king_dc, "cards")[0]
+        # kdc_val = kdc.fetch("value")
+        # kdc_suit = kdc.fetch("suit")
 
+        # discard king card from cpu hand
+        # i tried to avoid it but i will no choice but to make discard pile just like hand arrays speaking of that i think if i really wanted to i can revert hands to original way since i dont need take from hands anymore
 
-# discard king card from cpu hand
-# i tried to avoid it but i will no choice but to make discard pile just like hand arrays speaking of that i think if i really wanted to i can revert hands to original way since i dont need take from hands anymore
+        # find the new king in array
 
-          # find the new king in array
-          if @pile_arr != nil
-            @pile_arr.push(king_arr[king_arr.index(dis_c_king)])
-          elsif @discard_arr != nil
-          @discard_arr.push(king_arr[king_arr.index(dis_c_king)])
-          end # addding new king to discard pile
+        @discard_pile.push(king_img)
 
-          # #add discarded king that is new to discard
-          # pile_name = "discard"
-          # pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + dis_c_king
-          # res = HTTP.get(pile)
+        # #add discarded king that is new to discard
+        # pile_name = "discard"
+        # pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + dis_c_king
+        # res = HTTP.get(pile)
 
-          
-          # if session[:text] != nil
-            @text.push("\n\nCPU discards #{dis_king_val} of #{dis_king_suit}")
-            #only add session:text to text if action is not draw for player
-            if @did_draw != nil && @did_draw == "next_draw"
-              # session[:text] = @text.join(",")
-            else
-              # session[:text] = session[:text].join(",") + "," + @text.join(",")
-            end
-          # else
-            # @text.push("\n\nCPU discards #{dis_king_val} of #{dis_king_suit}")
-          # end # session text
-          # end # check for changed card being held in hand ; might need to do the same for discard pile unless im doing it elsewhere
-          # end # if n_king_in_hand
-        end # if discarded ! = dis_c_king
+        # if session[:text] != nil
+        @text.push("\n\nCPU discards #{dis_king_val} of #{dis_king_suit}")
+        #only add session:text to text if action is not draw for player
+        if @did_draw != nil && @did_draw == "next_draw"
+          # session[:text] = @text.join(",")
+        else
+          # session[:text] = session[:text].join(",") + "," + @text.join(",")
+        end
+        # else
+        # @text.push("\n\nCPU discards #{dis_king_val} of #{dis_king_suit}")
+        # end # session text
+        # end # check for changed card being held in hand ; might need to do the same for discard pile unless im doing it elsewhere
+        # end # if n_king_in_hand
+        # end # if discarded ! = dis_c_king
       elsif discarded == "AC" || discarded == "AH" || discarded == "AD" || discarded == "AS"
+        ace_img = []
+        dis_ace_val = "ACE"
+
         case max_suit
         when "HEARTS"
           dis_c_ace = "AH"
+          dis_ace_suit = "HEARTS"
+          ace_img = ace_arr[heart_indx]
         when "DIAMONDS"
           dis_c_ace = "AD"
+
+          dis_ace_suit = "DIAMONDS"
+          ace_img = ace_arr[diamond_indx]
         when "SPADES"
           dis_c_ace = "AS"
+          dis_ace_suit = "SPADES"
+          ace_img = ace_arr[spade_indx]
         when "CLUBS"
           dis_c_ace = "AC"
+          dis_ace_suit = "CLUBS"
+          ace_img = ace_arr[clubs_indx]
         end
 
         #update cpu hand
-       
+        #discard discarded from cpu hand in order to return from deck
+        pile_name = "cpu_hand"
+        pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + discarded
+        res = HTTP.get(pile)
+
+        has_discarded = true
 
         puts "max suit in ace if is #{max_suit}"
         pile_name = "deck"
@@ -497,35 +544,43 @@ drawn_cpu_value = cpu_draw.fetch("value")
         pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + d4_cards
         api_response(pile, "piles")
 
-        if (discarded != dis_c_ace)
-          pile_name = "deck"
-          #draw new ace in order to change king suit to max_suit
-          ace_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + dis_c_ace
+        # if (discarded != dis_c_ace)
+        #   pile_name = "deck"
+        #   #draw new ace in order to change king suit to max_suit
+        #   ace_dc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + dis_c_ace
 
-          adc = api_response(ace_dc, "cards")[0]
-          adc_val = adc.fetch("value")
-          adc_suit = adc.fetch("suit")
+        #   adc = api_response(ace_dc, "cards")[0]
+        #   adc_val = adc.fetch("value")
+        #   adc_suit = adc.fetch("suit")
 
-          pile_name = "discard"
-          pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + dis_c_ace
-          res = HTTP.get(pile)
-          #makes it so that CPU can discard an ace and change it to the suit it has the most cards for
+        # pile_name = "discard"
+        # pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + dis_c_ace
+        # res = HTTP.get(pile)
+        # discard by pushing to new array
 
-          # else # discarded card was not a king or ace and that means dont have to do anything special so only have to add discarded
+        #makes it so that CPU can discard an ace and change it to the suit it has the most cards for
 
-          #   # add the discarded card to discard pile
-          #   pile_name = "discard"
-          #   @cd_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + discarded
-          #   #res = HTTP.get(pile)
-          #   d_cpu_res = api_response(@cd_pile, "piles") #.fetch(pile_name).fetch("cards")
-          # if session[:text] != nil
-            @text.push("\n\nCPU discards #{adc_val} of #{adc_suit}")
-            # session[:text] = session[:text] + "," + @text.join(",")
-          # else
-            # @text.push("\n\nCPU discards #{adc_val} of #{adc_suit}")
-          # end #if for session
-        end # if for checking if discarded is the same as ace to be changed
-        # end
+        # else # discarded card was not a king or ace and that means dont have to do anything special so only have to add discarded
+
+        #   # add the discarded card to discard pile
+        #   pile_name = "discard"
+        #   @cd_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + discarded
+        #   #res = HTTP.get(pile)
+        #   d_cpu_res = api_response(@cd_pile, "piles") #.fetch(pile_name).fetch("cards")
+        # if session[:text] != nil
+        # @text.push("\n\nCPU discards #{adc_val} of #{adc_suit}")
+        # session[:text] = session[:text] + "," + @text.join(",")
+        # else
+        # @text.push("\n\nCPU discards #{adc_val} of #{adc_suit}")
+        # end #if for session
+        # end # if for checking if discarded is the same as ace to be changed
+
+        # puts dis_ace_suit
+        # puts ace_img
+        @discard_pile.push(ace_img)
+        @text.push("\n\nCPU discards #{dis_ace_val} of #{dis_ace_suit}")
+        puts "this does twice apparently"
+        #ok so maybe i need to do if statment for discard pile pushing like bool variable when king or ace img has been discarded
       end #if statement for aces
 
       #in else for cant discard so that means able to discard here
@@ -536,41 +591,36 @@ drawn_cpu_value = cpu_draw.fetch("value")
       if !has_discarded
         pile_name = "cpu_hand"
         @ch_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + discarded
-        #res = HTTP.get(pile)
+        # res = HTTP.get(@ch_pile)
+        discarded_cpu = api_response(@ch_pile, "cards")[0]
+        # pile_name = "discard"
+        # pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + discarded
+        # res = HTTP.get(pile)
 
-        #got index of discarded
-        disc_index = cpu_h_codes.index(discarded)
+        #discard by pushing to array
+        @discard_pile.push(discarded_cpu.fetch("image"))
 
-        #.select! to remove discarded from codes
-        cpu_h_codes.select! { |code| code != discarded }
-        puts "codes after select are #{cpu_h_codes}"
-        #.select! to remove discarded from cards
-        @cpu_h_cards.select! { |card| @cpu_h_cards.index(card) != disc_index }
-
-        #.select! to remove discarded from suits
-        suits.select! { |suit| suits.index(suit) != disc_index }
-
-        #.select! to remove discarded from values
-        values.select! { |val| values.index(val) != disc_index }
-puts   " is cpu_h_codes length " + cpu_h_codes.length.to_s
-puts  " is cpu_h_cards length " + @cpu_h_cards.length.to_s 
-puts  " is suits lenght " + suits.length.to_s
-puts  " is values length " + values.length.to_s 
-
-        pile_name = "discard"
-        pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + discarded
-        res = HTTP.get(pile)
-
+        # add value and suit to variables so can be used to properly chose card to discard
+        @dis_val = discarded_cpu.fetch("value")
+        @dis_suit = discarded_cpu.fetch("suit")
         # if session[:text] != nil
         #   if session[:text].is_a?(String)
-            @text.push("\n\nCPU discards #{cpu_d_val} of #{cpu_d_suit}")
-            # session[:text] = session[:text] + "," + @text.join(",")
-          # elsif session[:text].is_a?(Array)
-          #   @text.push("\n\nCPU discards #{cpu_d_val} of #{cpu_d_suit}")
-          #   session[:text] = session[:text].join(",") + "," + @text.join(",")
-          # end
+        @text.push("\n\nCPU discards #{cpu_d_val} of #{cpu_d_suit}")
+
+        # move this to be an elsif after aces
+        if cpu_d_val == "JACK" || cpu_d_val == "QUEEN"
+          session[:player_turn] = false
+          cpu_turns += 1
+          cpu_action(cpu_d_val, cpu_d_suit)
+        end
+
+        # session[:text] = session[:text] + "," + @text.join(",")
+        # elsif session[:text].is_a?(Array)
+        #   @text.push("\n\nCPU discards #{cpu_d_val} of #{cpu_d_suit}")
+        #   session[:text] = session[:text].join(",") + "," + @text.join(",")
+        # end
         # else
-          # @text.push("\n\nCPU discards #{cpu_d_val} of #{cpu_d_suit}")
+        # @text.push("\n\nCPU discards #{cpu_d_val} of #{cpu_d_suit}")
         # end
         # end
       end # end if to check if card was already discarded from cpu_hand
@@ -597,11 +647,23 @@ puts  " is values length " + values.length.to_s
   cookies[:cpu_suits] = suits.join(",")
   cookies[:cpu_values] = values.join(",")
 
-  # @new_images = []
-  # @new_cards.each do |n|
-  #   @new_images.push(n.fetch("image"))
-  # end #end loop
+  @new_images = []
+  @new_cards.each do |n|
+    @new_images.push(n.fetch("image"))
+  end #end loop
 
+  if @discard_pile != nil
+    cookies[:discard_pile] = @discard_pile.join(",")
+
+    if cpu_d_val == "KING"
+      #use cookies cpu_val
+      cookies[:last_suit] = dis_king_suit
+    elsif cpu_d_val == "ACE"
+      #use cookies cpu_val
+
+      cookies[:last_suit] = dis_ace_suit
+    end
+  end
 end #end function
 
 get("/") do
@@ -804,16 +866,23 @@ resp = HTTP.get(pile_list)
   # end
 
   # need to add to discard pile
-  pile_name = "discard"
+  # pile_name = "discard"
 
-  first_discard = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + @code
+  # first_discard = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + @code
 
-  #adds first card to discard pile
-  api_response(first_discard, "success")
-  # need to add to pile
+  # #adds first card to discard pile
+  # api_response(first_discard, "success")
+  # # need to add to pile
   #   pile_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
   #  api_response(pile_list, "success")
   #make it so the cards that do not match the most recent card are disabled
+
+  @discard_pile = []
+
+  #add first discard to pile
+  @discard_pile.push(@card)
+
+  cookies[:discard_pile] = @discard_pile
 
   #make array that's filled with cards that do not match the suit or value of card in discard pile or are not king or ace cards
   @disabled_arr = []
@@ -890,105 +959,179 @@ get("/discard") do
   d_res = []
 
   #these arrs holds all kings and aces used to check if king or ace cpu is looking for is in player's hand
-  k_arr = []
-  a_arr = []
+  k_arr = cookies[:king_arr].split(",")
+  a_arr = cookies[:ace_arr].split(",")
+
+  spade_indx = 0
+  clubs_indx = 1
+  diamond_indx = 2
+  heart_indx = 3
+
+  @code_arr = []
+
+  @dis_val = ""
+  @dis_suit = ""
+
+  # #add discard pile here
+  #  ? @discard_pile = cookies[:discard_pile].split(",")
+  @discard_pile = []
+
+  if @discard_pile.length == 0
+    arr = cookies[:discard_pile].split(",")
+
+    arr.each do |a|
+      if a != @discard_pile.last
+        @discard_pile.push(a)
+      end
+    end
+  end
+  # last = arr[]
+
+  discarded_value = ""
+    discarded_suit = ""
   #if to check which king card is being discarded; it would be chosen from button so fetch king
   if params.key?("king")
     # i will most likely have to disable discard when king is selected in hand
     king_p = params.fetch("king")
 
-    discarded_value = ""
-    discarded_suit = ""
+    # discarded_value = ""
+    # discarded_suit = ""
+    # discarded_img = ""
     case king_p
     when "KS"
       discarded_value = "KING"
       discarded_suit = "SPADES"
+      king_img = k_arr[spade_indx]
     when "KC"
       discarded_value = "KING"
       discarded_suit = "CLUBS"
+      king_img = k_arr[clubs_indx]
     when "KH"
       discarded_value = "KING"
       discarded_suit = "HEARTS"
+      king_img = k_arr[heart_indx]
     when "KD"
       discarded_value = "KING"
       discarded_suit = "DIAMONDS"
+      king_img = k_arr[diamond_indx]
     end
+
+    @code_arr.push(king_p)
 
     pile_name = "hand"
     #need to draw king from hand and do not add to discard just add back to deck pile unless kingcnt = 4 then return to deck then draw new king from deck and that to discard
     king_hd = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + @discard
     api_response(king_hd, "success")
 
-    king_cnt = cookies[:king_cnt].to_i
+    # still need to add new king to discard pile
+    # pile_name = "discard"
+    # dis_kdc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + king_p
+    # api_response(dis_kdc, "success")
 
-    king_cnt += 1
+    # and add new king to discard pile
+    @discard_pile.push(king_img)
+    #  discarded_value = res_k.fetch("value")
+    #  discarded_suit = res_k.fetch("suit")
 
-    if king_cnt == 4
-      #return king from hand to deck and no longer draw any kings
-      pile_name = "deck"
-      return_kdc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/return/?cards=" + @discard
-      api_response(return_dc, "success")
+    # pile_name = "discard"
+    # dis_kdc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + king_p
+    # api_response(dis_kdc, "success")
 
-      # still need to add new king to discard pile
-      pile_name = "discard"
-      dis_kdc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + king_p
-      api_response(dis_kdc, "success")
+    # discarded_value = res_k.fetch("value")
+    # discarded_suit = res_k.fetch("suit")
 
-      #  discarded_value = res_k.fetch("value")
-      #  discarded_suit = res_k.fetch("suit")
+  elsif params.key?("ace")
+    ace_p = params.fetch("ace")
 
-    else
-
-      #otherwise return to deck pile
-      pile_name = "deck"
-      deck_king = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + @discard
-      api_response(deck_king, "success")
-
-      # and add new king to discard pile
-      pile_name = "discard"
-      dis_kdc = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + king_p
-      api_response(dis_kdc, "success")
-
-      # discarded_value = res_k.fetch("value")
-      # discarded_suit = res_k.fetch("suit")
+    case ace_p
+    when "AS"
+      discarded_value = "ACE"
+      discarded_suit = "SPADES"
+      ace_img = a_arr[spade_indx]
+    when "AC"
+      discarded_value = "ACE"
+      discarded_suit = "CLUBS"
+      ace_img = a_arr[clubs_indx]
+    when "AH"
+      discarded_value = "ACE"
+      discarded_suit = "HEARTS"
+      ace_img = a_arr[heart_indx]
+    when "AD"
+      discarded_value = "ACE"
+      discarded_suit = "DIAMONDS"
+      ace_img = a_arr[diamond_indx]
     end
+
+    @code_arr.push(ace_p)
+
+     pile_name = "hand"
+    #need to draw king from hand and do not add to discard just add back to deck pile unless kingcnt = 4 then return to deck then draw new king from deck and that to discard
+    ace_hd = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + @discard
+    api_response(ace_hd, "success")
+
+     pile_name = "deck"
+        draw_4 = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?count=4"
+        draw_4_cards = api_response(draw_4, "cards")
+
+        d4 = []
+        draw_4_cards.each do |d|
+          d4.push(d.fetch("code"))
+        end
+        d4_cards = d4.join(",")
+
+        pile_name = "cpu_hand"
+        pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + d4_cards
+        api_response(pile, "piles")
+
+
+@discard_pile.push(ace_img)
+
   else # no king value to be discarded so discard normally
     if cookies[:cpu_val] != nil
       cpu_val = cookies[:cpu_val]
     end
 
-    if cpu_val != nil && cpu_val == "JACK" || cpu_val == "QUEEN"
-      @text.push("CPU plays #{cpu_val}, skipping player's turn")
-    else
-      # drwing from hand here
-      pile_name = "hand"
+    # if cpu_val != nil && cpu_val == "JACK" || cpu_val == "QUEEN"
+    #   @text.push("CPU plays #{cpu_val}, skipping player's turn")
+    # else
+    # drwing from hand here
+    pile_name = "hand"
 
-      #draw from the pile which would be discarding in this case; this discards chosen card from hand
-      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + @discard
+    #draw from the pile which would be discarding in this case; this discards chosen card from hand
+    pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + @discard
 
-      d_res = api_response(pile, "cards")
+    d_res = api_response(pile, "cards")
 
-      discarded_value = ""
-      discarded_suit = ""
-      d_res.each do |d|
-        discarded_value = d.fetch("value")
-        discarded_suit = d.fetch("suit")
-      end
-      #/pile/discard is name of pile - its discard
-      pile_name = "discard"
-
-      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + @discard
-
-      resp = HTTP.get(pile)
-
-      raw_response = resp.to_s
-
-      parsed_response = JSON.parse(raw_response)
-
-      #end of if for king/ace
-
-      # will need to do discarded value and suit for king/ace
+    # discarded_value = ""
+    # discarded_suit = ""
+    discarded_img = ""
+    discarded_code = ""
+    d_res.each do |d|
+      discarded_value = d.fetch("value")
+      discarded_suit = d.fetch("suit")
+      discarded_img = d.fetch("image")
+      discarded_code = d.fetch("code")
     end
+    #discard
+
+    @discard_pile.push(discarded_img)
+    @code_arr.push(discarded_code)
+
+    #/pile/discard is name of pile - its discard
+    # pile_name = "discard"
+
+    # pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + @discard
+
+    # resp = HTTP.get(pile)
+
+    # raw_response = resp.to_s
+
+    # parsed_response = JSON.parse(raw_response)
+
+    #end of if for king/ace
+
+    # will need to do discarded value and suit for king/ace
+    # end
   end
   # end
 =begin
@@ -1026,10 +1169,10 @@ get("/discard") do
   #join text add to cookies and split and assign in draw
   # try making @text "global"
   # if session[:text] != nil
-    # @text.push(session[:text])
-    @text.push("You discarded the #{discarded_value} of #{discarded_suit}")
-    # session[:text] = @text.join(",")
-    # puts session[:text]
+  # @text.push(session[:text])
+  @text.push("You discarded the #{discarded_value} of #{discarded_suit}")
+  # session[:text] = @text.join(",")
+  # puts session[:text]
   # else
   #   @text.push("You discarded the #{discarded_value} of #{discarded_suit}")
   #   session[:text] = @text.to_s
@@ -1071,26 +1214,26 @@ get("/discard") do
 
   #************************************************************************************************************************************
 
-  pile_name = "discard"
+  # pile_name = "discard"
 
-  pile_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+  # pile_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
 
-  resp = HTTP.get(pile_list)
+  # resp = HTTP.get(pile_list)
 
-  raw_response = resp.to_s
+  # raw_response = resp.to_s
 
-  parsed_response = JSON.parse(raw_response)
+  # parsed_response = JSON.parse(raw_response)
 
-  cards = parsed_response.fetch("piles").fetch("discard").fetch("cards")
+  # cards = parsed_response.fetch("piles").fetch("discard").fetch("cards")
 
-  @pile_arr = []
+  # @pile_arr = []
 
-  @code_arr = []
-  cards.each do |c|
-    @pile_arr.push(c.fetch("image"))
+  # @code_arr = []
+  # cards.each do |c|
+  #   @pile_arr.push(c.fetch("image"))
 
-    @code_arr.push(c.fetch("code"))
-  end
+  #   @code_arr.push(c.fetch("code"))
+  # end
 
   ################################## #################  end of discard pile
 
@@ -1098,24 +1241,43 @@ get("/discard") do
   #pile name is currently discard
   #pile_name = "discard"
 
-  discard_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+  # discard_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
 
-  @discard_res = api_response(discard_list, "piles").fetch(pile_name).fetch("cards")
+  # @discard_res = api_response(discard_list, "piles").fetch(pile_name).fetch("cards")
 
   #get last added card which would be on top of discard pile
-  @discard_arr = []
+  # @discard_arr = []
 
-  @discard_res.each_with_index do |d, i|
-    @in = i
-    @dlen = @discard_res.length
-    if i == @discard_res.length - 1
-      @top_discard = d
-    end
+  # @discard_res.each_with_index do |d, i|
+  #   @in = i
+  #   @dlen = @discard_res.length
+  #   if i == @discard_res.length - 1
+  #     @top_discard = d
+  #   end
 
-    @discard_arr.push(d.fetch("image"))
+  #   @discard_arr.push(d.fetch("image"))
+  # end
+
+  d = URI.decode_www_form_component(cookies[:discard_pile])
+  arr = d.split(",")
+  # puts arr.last
+  # arr.each do |c|
+  #   @discard_pile.push(URI.decode_www_form_component(c))
+  # end
+  if arr.last != @discard_pile[0] && arr.last != @discard_pile.last
+    @discard_pile.push(URI.decode_www_form_component(arr.last))
   end
+  @discard_pile.each_with_index do |d, i|
+    if i == @discard_pile.length - 1
+      @top_discard = d #image need code,value,suit
+    end
+  end
+  #get code from image string
+  top_code = @top_discard.gsub(/[A-Z]/, "")
 
-  cookies[:top_code] = @top_discard.fetch("code")
+  cookies[:top_code] = top_code
+
+  # cookies[:top_code] = @top_discard.fetch("code")
   #cookies[:top_value] = @top_discard.fetch("value")
   #cookies[:top_suit] = @top_discard.fetch("suit")
   #@top_discard.class
@@ -1128,7 +1290,12 @@ get("/discard") do
   @cards.each_with_index do |c, i|
 
     #this code should still work with this project I think i just need to change the whole thing from checkboxes to radio buttons bc i only need to choose one
-    if !(c.fetch("value") == @top_discard["value"] || c.fetch("suit") == @top_discard["suit"] || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
+    # if !(c.fetch("value") == @top_discard["value"] || c.fetch("suit") == @top_discard["suit"] || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
+    if !(c.fetch("value") == @dis_val || c.fetch("suit") == @dis_suit || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
+      # puts @dis_val
+      # puts @dis_suit
+      # puts c.fetch("value")
+      # puts c.fetch("suit")
       @disabled_arr.push(c)
     end
 
@@ -1161,6 +1328,8 @@ get("/discard") do
   # if @top_discard.fetch("value") == "KING"
   #   @is_king = true
   # end
+
+  cookies[:discard_pile] = @discard_pile.join(",")
 
   erb(:discard)
 end
@@ -1242,32 +1411,63 @@ resp = HTTP.get(add_hand)
 
   ################################################### start of disabled logic
 
-  pile_name = "discard"
+  # pile_name = "discard"
 
-  discard_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+  # discard_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
 
-  @discard_res = api_response(discard_list, "piles").fetch(pile_name).fetch("cards")
+  # @discard_res = api_response(discard_list, "piles").fetch(pile_name).fetch("cards")
+
+  @discard_pile = cookies[:discard_pile].split(",")
+  #   @discard_pile.push(discarded_img)
+  #   @code_arr.push(discarded_code)
+  # cookies[:discard_pile] = @discard_pile.join(",")
+  # d = URI.decode_www_form_component(cookies[:discard_pile])
+  # arr = d.split(",")
+  # puts arr.last
+  # arr.each do |c|
+  #   @discard_pile.push(URI.decode_www_form_component(c))
+  # end
+  # if arr.last != @discard_pile[0] && arr.last != @discard_pile.last
+  #   @discard_pile.push(URI.decode_www_form_component(arr.last))
+  # end
+  @discard_pile.each_with_index do |d, i|
+    if i == @discard_pile.length - 1
+      @top_discard = d #image need code,value,suit
+    end
+  end
+  #get code from image string
+  top_code = @top_discard.gsub(/[A-Z]/, "")
+
+  cookies[:top_code] = top_code
+
+  if cookies[:last_val] == nil
+    top_val = cookies[:cpu_val]
+    top_suit = cookies[:cpu_suit]
+  else
+    top_val = cookies[:cpu_val]
+    top_suit = cookies[:last_suit]
+  end
 
   #get last added card which would be on top of discard pile
   @discard_arr = []
 
   images = []
 
-  @discard_res.each_with_index do |d, i|
-    @in = i
-    @dlen = @discard_res.length
-    if i == @discard_res.length - 1
-      @top_discard = d
-    end
+  # @discard_res.each_with_index do |d, i|
+  #   @in = i
+  #   @dlen = @discard_res.length
+  #   if i == @discard_res.length - 1
+  #     @top_discard = d
+  #   end
 
-    images.push(d.fetch("image"))
-  end
+  #   images.push(d.fetch("image"))
+  # end
 
   # needs to be here so @text works in cpu_action
   # if session[:text] != nil
   #   @text = session[:text].split(",")
   # else
-    @text = []
+  @text = []
   # end
 
   @text.push("You drew a card") #discarded the #{discarded_value} of #{discarded_suit}")
@@ -1281,9 +1481,9 @@ resp = HTTP.get(add_hand)
   # @hand = session[:hand].split("!")
 
   # this has to be done here so discard pile is properly updated
-  images.each do |i|
-    @discard_arr.push(i)
-  end
+  # images.each do |i|
+  #   @discard_arr.push(i)
+  # end
 
   #@top_discard.class
   #make it so the cards that do not match the most recent card are disabled
@@ -1297,7 +1497,7 @@ resp = HTTP.get(add_hand)
   @hand_objs.each_with_index do |c, i|
 
     #this code should still work with this project I think i just need to change the whole thing from checkboxes to radio buttons bc i only need to choose one
-    if !(c.value == @top_discard["value"] || c.suit == @top_discard["suit"] || c.value == "KING" || c.value == "ACE")
+    if !(c.value == top_val || c.suit == top_suit || c.value == "KING" || c.value == "ACE")
       @disabled_arr.push(c)
     end
 
@@ -1320,7 +1520,7 @@ resp = HTTP.get(add_hand)
   # puts @top_discard
 
   #this has to be here to get top discard
-  cpu_action(@top_discard.fetch("value"), @top_discard.fetch("suit"))
-
+  # cpu_action(@top_discard.fetch("value"), @top_discard.fetch("suit"))
+  cpu_action(top_val, top_suit)
   erb(:draw)
 end
