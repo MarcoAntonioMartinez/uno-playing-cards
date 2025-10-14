@@ -212,21 +212,15 @@ def cpu_action(value, suit)
 
   session[:player_turn] = true
 
-  # array that has aces in it
-  ace_arr = [
-    "https://deckofcardsapi.com/static/img/AS.png", "https://deckofcardsapi.com/static/img/AC.png", "https://deckofcardsapi.com/static/img/AD.png", "https://deckofcardsapi.com/static/img/AH.png",
-  ]
-
-  # array that has kings in it
-  king_arr = ["https://deckofcardsapi.com/static/img/KS.png", "https://deckofcardsapi.com/static/img/KC.png", "https://deckofcardsapi.com/static/img/KD.png", "https://deckofcardsapi.com/static/img/KH.png"]
-
+ k_arr = cookies[:king_arr].split(",")
+  a_arr =cookies[:ace_arr].split(",")
+  
   spade_indx = 0
   clubs_indx = 1
   diamond_indx = 2
   heart_indx = 3
 
-  cookies[:king_arr] = king_arr.join(",")
-  cookies[:ace_arr] = ace_arr.join(",")
+ 
 
   @cpu_discarded = true
 
@@ -411,22 +405,22 @@ def cpu_action(value, suit)
           dis_c_king = "KH"
 
           dis_king_suit = "HEARTS"
-          king_img = king_arr[heart_indx]
+          king_img = k_arr[heart_indx]
         when "DIAMONDS"
           dis_c_king = "KD"
 
           dis_king_suit = "DIAMONDS"
-          king_img = king_arr[diamond_indx]
+          king_img = k_arr[diamond_indx]
         when "SPADES"
           dis_c_king = "KS"
 
           dis_king_suit = "SPADES"
-          king_img = king_arr[spade_indx]
+          king_img = k_arr[spade_indx]
         when "CLUBS"
           dis_c_king = "KC"
 
           dis_king_suit = "CLUBS"
-          king_img = king_arr[clubs_indx]
+          king_img = k_arr[clubs_indx]
         end
         puts "max suit in king if is #{max_suit}"
 
@@ -505,20 +499,20 @@ def cpu_action(value, suit)
         when "HEARTS"
           dis_c_ace = "AH"
           dis_ace_suit = "HEARTS"
-          ace_img = ace_arr[heart_indx]
+          ace_img = a_arr[heart_indx]
         when "DIAMONDS"
           dis_c_ace = "AD"
 
           dis_ace_suit = "DIAMONDS"
-          ace_img = ace_arr[diamond_indx]
+          ace_img = a_arr[diamond_indx]
         when "SPADES"
           dis_c_ace = "AS"
           dis_ace_suit = "SPADES"
-          ace_img = ace_arr[spade_indx]
+          ace_img = a_arr[spade_indx]
         when "CLUBS"
           dis_c_ace = "AC"
           dis_ace_suit = "CLUBS"
-          ace_img = ace_arr[clubs_indx]
+          ace_img = a_arr[clubs_indx]
         end
 
         #update cpu hand
@@ -679,6 +673,19 @@ get("/game") do
   # end
   #make sure to reset king counter everytime new game starts
   cookies[:king_cnt] = 0
+
+  # array that has aces in it
+  ace_arr = [
+    "https://deckofcardsapi.com/static/img/AS.png", "https://deckofcardsapi.com/static/img/AC.png", "https://deckofcardsapi.com/static/img/AD.png", "https://deckofcardsapi.com/static/img/AH.png",
+  ]
+
+  # array that has kings in it
+  king_arr = ["https://deckofcardsapi.com/static/img/KS.png", "https://deckofcardsapi.com/static/img/KC.png", "https://deckofcardsapi.com/static/img/KD.png", "https://deckofcardsapi.com/static/img/KH.png"]
+
+ cookies[:king_arr] = king_arr.join(",")
+  cookies[:ace_arr] = ace_arr.join(",")
+  
+  
 
   new_deck = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1"
 
