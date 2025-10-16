@@ -60,23 +60,9 @@
 <div class="scroll_container">
 <div class="long_content">
   <h2> Discard pile</h2>
-  <!--
-<h2> new_king is < %= @new_king % > </h2>
-<h2> new_king is < % = @in_king % > </h2>
-<h2> top discard is < % = @top_discard % > </h2>
-
-<h2> <%= @discard %> </h2>
-<h2> pile is:  <%= @pile %> </h2>
-<h2> new_king is <%= @new_king %> </h2>
--->
+ 
   <ul>
-    <!-- 
-    < % @pile_arr.each_with_index do |c, i| % >
-
-      <li>  <label>
-          <img src="< % = c % >" id="< % = @code_arr[i] % >"  /></label>
-      </li>
--->
+     
     <% @discard_pile.each_with_index do |c, i| %>
 
       <li>  <label>
@@ -88,8 +74,7 @@
 </div>
   <p> <%= @cpu_empty %> is cpu empty</p>
 
-  <!-- king array goes here if i still need it -->
-
+   
   <% if @cpu_empty%>
     <p> <%= @cpu_empty %> is cpu empty</p>
     <button formaction="/result" type="submit" id="result" name="result" value="lose"> discard</button>
