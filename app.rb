@@ -6,7 +6,7 @@ require "sinatra/contrib"
 require "uri"
 require_relative "hand"
 
-# idk if i should go and replace the code with this function now or later ill find out i guess
+# handles api requests
 def api_response(url, key)
   resp = HTTP.get(url)
 
