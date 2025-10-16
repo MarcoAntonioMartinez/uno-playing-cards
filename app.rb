@@ -166,6 +166,8 @@ def cpu()
   ################################################### end of making cpu hand
   #  return cards_res
   cookies[:cpu_turns] = 0
+
+  session[:player_turn] = true
 end
 
 ####################################################################################################################
@@ -210,7 +212,7 @@ def cpu_action(value, suit)
   session[:jack_used] = false
   session[:queen_used] = false
 
-  session[:player_turn] = true
+  
 
  k_arr = cookies[:king_arr].split(",")
   a_arr =cookies[:ace_arr].split(",")
@@ -230,7 +232,7 @@ def cpu_action(value, suit)
   cpu_turns = cookies[:cpu_turns].to_i
 
   if cpu_turns == 3
-    session[:player_turn] = false
+    session[:player_turn] = true
   end
 
   puts session[:player_turn].class
@@ -360,6 +362,8 @@ def cpu_action(value, suit)
       drawn_cpu_value = cpu_draw.fetch("value")
       drawn_cpu_suit = cpu_draw.fetch("suit")
 
+      @dis_val = cookies[:disc_val] 
+  @dis_suit = cookies[:disc_suit] 
       # drawn_cpu_card = ""
       # drawn_cpu_value = ""
       # drawn_cpu_suit = ""
@@ -398,7 +402,7 @@ def cpu_action(value, suit)
       #var to hold discarded king
       dis_c_king = ""
       king_img = ""
-      if discarded == "KC" || discarded == "KH" || discarded == "KD" || discarded == "KS"
+      if discarded == "KC" || discarded == "KH" || discarded == "KD" || discarded == "KS" 
         dis_king_val = "KING"
         case max_suit
         when "HEARTS"
@@ -472,6 +476,9 @@ def cpu_action(value, suit)
 
         @discard_pile.push(king_img)
 
+        cookies[:disc_val] = dis_king_val
+  cookies[:disc_suit] = dis_king_suit
+
         # #add discarded king that is new to discard
         # pile_name = "discard"
         # pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + dis_c_king
@@ -491,7 +498,8 @@ def cpu_action(value, suit)
         # end # check for changed card being held in hand ; might need to do the same for discard pile unless im doing it elsewhere
         # end # if n_king_in_hand
         # end # if discarded ! = dis_c_king
-      elsif discarded == "AC" || discarded == "AH" || discarded == "AD" || discarded == "AS"
+        ace = !has_discarded
+      elsif discarded == "AC" || discarded == "AH" || discarded == "AD" || discarded == "AS" 
         ace_img = []
         dis_ace_val = "ACE"
 
@@ -524,6 +532,8 @@ def cpu_action(value, suit)
         has_discarded = true
 
         puts "max suit in ace if is #{max_suit}"
+        
+        
         pile_name = "deck"
         draw_4 = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?count=4"
         draw_4_cards = api_response(draw_4, "cards")
@@ -572,6 +582,8 @@ def cpu_action(value, suit)
         # puts dis_ace_suit
         # puts ace_img
         @discard_pile.push(ace_img)
+                cookies[:disc_val] = dis_ace_val
+  cookies[:disc_suit] = dis_ace_suit
         @text.push("\n\nCPU discards #{dis_ace_val} of #{dis_ace_suit}")
         puts "this does twice apparently"
         #ok so maybe i need to do if statment for discard pile pushing like bool variable when king or ace img has been discarded
@@ -594,16 +606,24 @@ def cpu_action(value, suit)
         #discard by pushing to array
         @discard_pile.push(discarded_cpu.fetch("image"))
 
+        
         # add value and suit to variables so can be used to properly chose card to discard
         @dis_val = discarded_cpu.fetch("value")
         @dis_suit = discarded_cpu.fetch("suit")
+
+                cookies[:disc_val] = @dis_val
+  cookies[:disc_suit] = @dis_suit
+
+
         # if session[:text] != nil
         #   if session[:text].is_a?(String)
         @text.push("\n\nCPU discards #{cpu_d_val} of #{cpu_d_suit}")
 
         # move this to be an elsif after aces
         if cpu_d_val == "JACK" || cpu_d_val == "QUEEN"
+          # puts "session before assign" + session[:player_turn].to_s
           session[:player_turn] = false
+          # puts "session after assign" + session[:player_turn].to_s
           cpu_turns += 1
           cpu_action(cpu_d_val, cpu_d_suit)
         end
@@ -658,6 +678,13 @@ def cpu_action(value, suit)
       cookies[:last_suit] = dis_ace_suit
     end
   end
+
+  if @new_images.length == 1
+    @cpu_empty = true
+  end
+
+  cookies[:disc_val] = cpu_d_val
+  cookies[:disc_suit] = cpu_d_suit
 end #end function
 
 get("/") do
@@ -889,6 +916,7 @@ resp = HTTP.get(pile_list)
   #add first discard to pile
   @discard_pile.push(@card)
 
+  
   cookies[:discard_pile] = @discard_pile
 
   #make array that's filled with cards that do not match the suit or value of card in discard pile or are not king or ace cards
@@ -1037,6 +1065,9 @@ get("/discard") do
 
     # and add new king to discard pile
     @discard_pile.push(king_img)
+      cookies[:disc_val] = discarded_value
+  cookies[:disc_suit] = discarded_suit
+
     #  discarded_value = res_k.fetch("value")
     #  discarded_suit = res_k.fetch("suit")
 
@@ -1092,6 +1123,8 @@ get("/discard") do
 
 
 @discard_pile.push(ace_img)
+cookies[:disc_val] = discarded_value
+  cookies[:disc_suit] = discarded_suit
 
   else # no king value to be discarded so discard normally
     if cookies[:cpu_val] != nil
@@ -1123,6 +1156,8 @@ get("/discard") do
 
     @discard_pile.push(discarded_img)
     @code_arr.push(discarded_code)
+    cookies[:disc_val] = discarded_value
+  cookies[:disc_suit] = discarded_suit
 
     #/pile/discard is name of pile - its discard
     # pile_name = "discard"
@@ -1187,6 +1222,14 @@ get("/discard") do
   # end
   #end of if for checking king was selected already discarding that card so else is when discarding other cards
 
+  session[:player_turn] = true
+  
+  #save it so can tell if cpu drew a card
+  if @new_images != nil
+  cpu_length = @new_images.length
+  else
+   cpu_length = 0
+  end
   #not sure where to put this
   cpu_action(discarded_value, discarded_suit)
 
@@ -1283,6 +1326,14 @@ get("/discard") do
   top_code = @top_discard.gsub(/[A-Z]/, "")
 
   cookies[:top_code] = top_code
+  if cpu_length != @new_images.length + 1
+        top_val = cookies[:disc_val] 
+  top_suit = cookies[:disc_suit] 
+  else
+    top_val = discarded_value
+    top_suit = discarded_suit
+  end
+
 
   # cookies[:top_code] = @top_discard.fetch("code")
   #cookies[:top_value] = @top_discard.fetch("value")
@@ -1298,11 +1349,13 @@ get("/discard") do
 
     #this code should still work with this project I think i just need to change the whole thing from checkboxes to radio buttons bc i only need to choose one
     # if !(c.fetch("value") == @top_discard["value"] || c.fetch("suit") == @top_discard["suit"] || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
-    if !(c.fetch("value") == @dis_val || c.fetch("suit") == @dis_suit || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
-      # puts @dis_val
-      # puts @dis_suit
-      # puts c.fetch("value")
-      # puts c.fetch("suit")
+    if !(c.fetch("value") == top_val || c.fetch("suit") == top_suit || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
+      puts @dis_val + " dis val"
+      puts @dis_suit + " dis suit"
+      puts c.fetch("value") + " current value"
+      puts c.fetch("suit") + " current suit"
+      puts top_val + " top_val"
+      puts top_suit + "top_suit"
       @disabled_arr.push(c)
     end
 
@@ -1338,6 +1391,9 @@ get("/discard") do
 
   cookies[:discard_pile] = @discard_pile.join(",")
 
+  top_val = cookies[:disc_val] 
+  top_suit = cookies[:disc_suit]
+
   erb(:discard)
 end
 
@@ -1372,6 +1428,8 @@ resp = HTTP.get(add_hand)
 
   #make sure cookies gets updated
   cookies[:count] = count
+
+  
 
   @begin = @add_card
 
@@ -1447,13 +1505,14 @@ resp = HTTP.get(add_hand)
 
   cookies[:top_code] = top_code
 
-  if cookies[:last_val] == nil
-    top_val = cookies[:cpu_val]
-    top_suit = cookies[:cpu_suit]
-  else
-    top_val = cookies[:cpu_val]
-    top_suit = cookies[:last_suit]
-  end
+  #this gives last one done by cpu i need the actual last discard
+  # if cookies[:last_val] == nil
+  #   top_val = cookies[:cpu_val]
+  #   top_suit = cookies[:cpu_suit]
+  # else
+  #   top_val = cookies[:cpu_val]
+  #   top_suit = cookies[:last_suit]
+  # end
 
   #get last added card which would be on top of discard pile
   @discard_arr = []
@@ -1498,6 +1557,10 @@ resp = HTTP.get(add_hand)
   #make array that's filled with cards that do not match the suit or value of card in discard pile or are not king or ace cards
   @disabled_arr = []
   @disable = []
+
+          top_val = cookies[:disc_val] 
+  top_suit = cookies[:disc_suit]
+
   #has code for cards in hand
 
   # must make a class which i can use to get the needed attributes
@@ -1529,5 +1592,24 @@ resp = HTTP.get(add_hand)
   #this has to be here to get top discard
   # cpu_action(@top_discard.fetch("value"), @top_discard.fetch("suit"))
   cpu_action(top_val, top_suit)
+
+  #try to update value and suit to make discarding in draw work
+    cookies[:disc_val] = top_val 
+    cookies[:disc_suit] = top_suit
+
+    
   erb(:draw)
+end
+
+
+get ("/result") do
+
+fetched = params.fetch(result)
+
+if fetched == win
+  @result = win
+else
+  @result = lose
+end
+  erb(:result)
 end
