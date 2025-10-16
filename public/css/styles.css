@@ -1,22 +1,38 @@
 html {
   min-height: 100%;
+  /* background-color:  #009d6c; */
+  /* , #00b640, #42bd13, #49be00);  */
 }
 
 body {
   min-height: 100%;
   padding: 40px 0;
-  /*  background: linear-gradient(90deg, #003f5b, #00405d, #004b66, #006978, #009d6c, #00b640, #42bd13, #49be00); /* made at https://learnui.design/tools/gradient-generator.html */
+   background-color:  #00b640;
   color: rgba(17, 17, 17, 1.0);
   font-family: 'Lora', serif;
 
 }
 
+.nav-container {
+border: 1px solid black;
+}
+
 div {
   /*just for effect*/
-  border: 1px solid brown;
+  /* border: 1px solid black; */
   display: inline-block;
   padding: 40px 40px;
+ /* display: flex; */
+      justify-content: center; /* Centers horizontally */
+      align-items: center;    /* Centers vertically */
+    
 }
+
+h1 {
+  width: 400px; /* Example width */
+      margin: 0 auto;
+}
+
 
 img {
   cursor: pointer;
