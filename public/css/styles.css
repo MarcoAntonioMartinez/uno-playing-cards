@@ -28,11 +28,28 @@ div {
     
 }
 
-h1 {
+h1  {
   width: 400px; /* Example width */
+  height: 200px;
       margin: 0 auto;
 }
 
+h2  {
+  width: 100px; /* Example width */
+      margin: 0 auto;
+}
+
+table, caption, th, tr, td {
+  background-color: #fff;
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.play {
+  /* justify-content: center; */
+  width: 100px;
+  /* margin: 0 auto; */
+}
 
 img {
   cursor: pointer;
@@ -111,6 +128,10 @@ label img {
 
   border-color: rgb(165, 42, 42);
 
+}
+
+.flex {
+  display: flex;
 }
 
 #next_draw {
