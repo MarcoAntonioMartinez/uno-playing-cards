@@ -1,24 +1,27 @@
-# sinatra-template
+# UNO with Playing Cards
 
-Use this repository to create new Sinatra apps. 
+UNO with Playing Cards is a game you can play where the face cards are the special UNO cards. Made using DeckofCardsApi.
 
-Optionally, to use `ActiveRecord` for database operations, add to the `app.rb`:
+  
 
-```ruby
-require "sinatra/activerecord"
-```
+## Rules
 
-And in the `config/environment.rb` file add this code block:
+| Action | UNO | Card |
+|---|---|---|
+| Change suit, draw 4 | Wild +4 | Ace
+| Change suit | Wild  | King |
+| Skip/Reverse | Skip/Reverse | Queen/Jack |
 
-```ruby
-configure do
-  # setup a database connection
-  set(:database, { adapter: "sqlite3", database: "db/development.sqlite3" })
-end
-```
+## Plans for future updates
+- Change Queen's functionallity to Draw 2
+- Make it so Jack becomes reverse/skip depending on player choice and number of people
+- If possible, somehow implement multiplayer in addition to play against CPU
+- Make it possible for deck to be reshuffled
+- Animations where possible
+
+
+ 
 
 Some rights reserved — see [LICENSE.txt](LICENSE.txt)
 
-<!--
- this version is more up to date and is before i put the selects for the cpu hand
- -->
+ 
