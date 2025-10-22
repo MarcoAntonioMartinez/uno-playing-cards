@@ -5,12 +5,13 @@
   <div>
     <h2> op's hand</h2>
     <% @c_image.each_with_index do |c,i| %>
-      <input type="radio" id="op<%= i %>" name="op<%= i %>" />
+      <input type="checkbox" id="op<%= i %>" name="op<%= i %>" />
       <label for="op<%= i %>"   id="op<%= i+1 %>"  > <img src="<%= c %>"/> </label>
       <!--"https://deckofcardsapi.com/static/img/back.png"-->
     <% end %>
   </div>
-  <div>
+
+  <div class="hand">
     <h2> Your hand</h2>
     <!-- <div id="img"> -->
 
@@ -19,16 +20,16 @@
       <% if @disable[i]%>
 
         <ul>
-          <li><input type="radio" id="card<%= i %>" name="<%= @code_arr[i] %>" class="disabled" disabled />
+          <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>" class="disabled" disabled />
             <label for="card<%= i %>" > <img src="<%= c %>" id="c<%= i+1 %>" class="disabled"  /></label>
           </li>
         </ul>
 
       <% else %>
         <ul>
-          <li><input type="radio" id="card<%= i %>" name="<%= @code_arr[i] %>"  />
+          <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>"  />
 
-            <label for="card<%= i %>" >
+            <label class="button-labels" for="card<%= i %>" >
               <img src="<%= c %>" id="c<%= @code_arr[i] %>"   />
 
               
@@ -54,15 +55,9 @@
 
       <% end %> <!-- end of if -->
     <% end %> <!-- end of loop -->
-    <!-- 
-  <h1> discards: <%= @discards %></h1>
-  <h1> first card: <%= @first_card[0] %></h1>
-  <h1> game_starting_draw url: <%= @game_starting_draw %></h1>
-
-  <h1> card image: <%= @card %></h1>
-  <h1> first card code: <%= @code %></h1>
--->
+ 
   </div>
+
   <div>
     <h1> Draw pile </h1>
     <!--
@@ -80,7 +75,7 @@
 
   <div>
     <h1> Discard pile </h1>
-    <input type="radio" id="start_card" name="start_card" />
+    <input type="checkbox" id="start_card" name="start_card" />
     <label for="start-card" > <img src="<%= @card %>" id="start_card" class="discard" /></label>
 
   </div>
