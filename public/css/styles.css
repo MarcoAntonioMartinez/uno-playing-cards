@@ -13,6 +13,7 @@ html {
 body > header {
   display: block;
   border: 1px solid black;
+  background-color: #00B89C;
 }
 
 body {
@@ -124,6 +125,10 @@ margin-bottom: 10px;
   margin-bottom: 20px;
 }
 
+/* .op {
+  display:flex;
+  flex-flow: row
+} */
 /* .play { */
   /* justify-content: center; */
   /* width: 100px;
@@ -145,6 +150,36 @@ margin-bottom: 10px;
   overflow: visible;
 }
 
+.note {
+  font-weight: 1200;
+  font-size: 30px;
+}
+
+.hand {
+  height: 840px;
+  width: 814px;
+  /* display: flex; */
+  /* flex-flow: nowrap; */
+}
+
+.hand > label {
+  display: inline;
+}
+
+.hand > li {
+    display: flex;
+  flex-flow: row nowrap;
+}
+
+.button-labels {
+  display:block;
+
+}
+
+.hand > h2 {
+  margin-bottom: 100px;
+  
+}
 img {
   cursor: pointer;
   text-decoration: underline;
@@ -152,13 +187,14 @@ img {
 
 ul {
   list-style-type: none;
+  display:inline;
 }
 
 li {
-  display: block;
+  display:inline;
 }
 
-input[type='radio'] {
+input[type='checkbox'] {
 
   /*  padding: 50px;
 
@@ -168,9 +204,9 @@ input[type='radio'] {
 }
 
 label {
-  border: 1px solid #fff;
+  /* border: 1px solid #fff; */
   padding: 10px;
-  display: block;
+  /* display: block; */
   position: relative;
   margin: 10px;
   cursor: pointer;
@@ -180,7 +216,7 @@ label:before {
   background-color: white;
   color: white;
   content: " ";
-  display: block;
+  /* display: block; */
   border-radius: 50%;
   border: 1px solid grey;
   position: absolute;
@@ -191,7 +227,8 @@ label:before {
   text-align: center;
   line-height: 28px;
   transition-duration: 0.4s;
-  transform: scale(0);
+  transform: scale(0)
+  /* transform: translate(20px); */
 }
 
 label img {
@@ -202,19 +239,21 @@ label img {
 }
 
 :checked+label {
-  border-color: #ddd;
+  /* border-color: #ddd; */
 }
 
 :checked+label:before {
-  content: "✓";
-  background-color: grey;
-  transform: scale(1);
+  /* content: "✓"; */
+  /* background-color: grey;
+  transform: scale(1); */
+  
 }
 
 :checked+label img {
-  transform: scale(0.9);
+  /* transform: translateY(-20px); */
+  /* translate: 50% -50%; */
   box-shadow: 0 0 5px #333;
-  z-index: -1;
+  /* z-index: -1; */
 }
 
 .disabled {
@@ -231,10 +270,10 @@ label img {
 
 }
 
-#king_disc {
+/* #king_disc {
   display: none;
 
-}
+} */
 
 .discard {
   height: 100px;
@@ -292,7 +331,7 @@ label img {
 :checked+label img[id="cKS"]~.king_btns,
 :checked+label img[id="cKC"]~.king_btns {
   display: block;
-
+border: 1px solid #ccc;
   /* try to make cropping work */
   width: 70px;
   height: 30px;
@@ -304,8 +343,9 @@ label img {
 :checked+label img[id="cKD"]~.king_btns img,
 :checked+label img[id="cKS"]~.king_btns img,
 :checked+label img[id="cKC"]~.king_btns img {
-  width: 74px;
+  width: 740px;
   height: 32px;
+  object-fit: cover;
   /* width: auto;
   height: auto; */
   margin: -5px 0 0 -10px;
