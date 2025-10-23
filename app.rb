@@ -34,7 +34,19 @@ def largest_hash_key(hash)
   hash.max_by { |k, v| v }
 end
 
- 
+ # make it so when discard button is pressed, random able card is discarded or at least chosen
+ def discard()
+
+  if @hand != nil
+    h_arr = @hand.select {|h| !disabled_arr.include?(h)}
+
+    rand_index = rand(0..h_arr.length-1)
+    return h_arr[rand_index] # so i think i either need to put this whole function after the if statement for discarding as part of the else statement or something and @hand array will have to be an array which takes from whatever array is being worked on in if ace king statement
+    # h_arr is image which would be randomly chosen so add to discard pile
+
+  end
+  # if @hand_arr != nil
+end
 #only goes in game
 def cpu()
   deck = cookies[:deck_id]
@@ -624,8 +636,30 @@ end
 
 get("/discard") do
 
+  # #add discard pile here
+  #  ? @discard_pile = cookies[:discard_pile].split(",")
+  @discard_pile = []
+
+  if @discard_pile.length == 0
+    arr = cookies[:discard_pile].split(",")
+
+    arr.each do |a|
+      if a != @discard_pile.last
+        @discard_pile.push(a)
+        
+      end
+    end
+  end
+  
+  #if no card was chosen then push random  card to discard pile
   #card to be discarded
+  #i forgot to do the push and make it uncommented so do that for next time
+  if params.empty? != true
   @discard = params.key("on")
+  else
+    @random = true
+    # @discard_pile.push(discard())
+  end
 
   deck = cookies[:deck_id]
 
@@ -649,24 +683,13 @@ get("/discard") do
   @dis_val = ""
   @dis_suit = ""
 
-  # #add discard pile here
-  #  ? @discard_pile = cookies[:discard_pile].split(",")
-  @discard_pile = []
-
-  if @discard_pile.length == 0
-    arr = cookies[:discard_pile].split(",")
-
-    arr.each do |a|
-      if a != @discard_pile.last
-        @discard_pile.push(a)
-      end
-    end
-  end
    
 
   discarded_value = ""
     discarded_suit = ""
   #if to check which king card is being discarded; it would be chosen from button so fetch king
+  if !@random
+
   if params.key?("king")
     # i will most likely have to disable discard when king is selected in hand
     king_p = params.fetch("king")
@@ -783,9 +806,9 @@ cookies[:disc_val] = discarded_value
     cookies[:disc_val] = discarded_value
   cookies[:disc_suit] = discarded_suit
 
- 
-  end
-  
+
+  end #end of if for params?
+end # end for random if  
   pile_name = "hand"
   hand_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
   @hand = api_response(hand_list, "piles").fetch(pile_name).fetch("cards")
