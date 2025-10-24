@@ -155,7 +155,7 @@ def cpu_action(value, suit)
     session[:player_turn] = true
   end
 
-  puts session[:player_turn].class
+  # puts session[:player_turn].class
 
   return if cpu_turns > 3
 
