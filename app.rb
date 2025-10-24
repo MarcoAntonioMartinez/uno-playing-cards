@@ -38,7 +38,7 @@ end
  def discard()
 
   if @hand != nil
-    h_arr = @hand.select {|h| !disabled_arr.include?(h)}
+    h_arr = @hand.select {|h| !@disabled_arr.include?(h)}
 
     rand_index = rand(0..h_arr.length-1)
     return h_arr[rand_index] # so i think i either need to put this whole function after the if statement for discarding as part of the else statement or something and @hand array will have to be an array which takes from whatever array is being worked on in if ace king statement
@@ -386,7 +386,7 @@ def cpu_action(value, suit)
                 cookies[:disc_val] = dis_ace_val
   cookies[:disc_suit] = dis_ace_suit
         @text.push("\n\nCPU discards #{dis_ace_val} of #{dis_ace_suit}")
-        puts "this does twice apparently"
+        # puts "this does twice apparently"
         #ok so maybe i need to do if statment for discard pile pushing like bool variable when king or ace img has been discarded
       end #if statement for aces
 
@@ -913,12 +913,7 @@ end # end for random if
     #this code should still work with this project I think i just need to change the whole thing from checkboxes to radio buttons bc i only need to choose one
     # if !(c.fetch("value") == @top_discard["value"] || c.fetch("suit") == @top_discard["suit"] || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
     if !(c.fetch("value") == top_val || c.fetch("suit") == top_suit || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
-      puts @dis_val + " dis val"
-      puts @dis_suit + " dis suit"
-      puts c.fetch("value") + " current value"
-      puts c.fetch("suit") + " current suit"
-      puts top_val + " top_val"
-      puts top_suit + "top_suit"
+       
       @disabled_arr.push(c)
     end
 
@@ -946,7 +941,45 @@ end # end for random if
   end
   ################################################### end of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
 
-  
+  # no card was chosen so choose a random card
+  else
+
+    #take random card
+@discard_pile.push(discard())
+
+
+puts "random discard is " + discard()
+# push to discard pile
+
+# remove from hand
+#make function for this
+pile_name = "hand"
+  hand_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+  @hand = api_response(hand_list, "piles").fetch(pile_name).fetch("cards")
+
+  discarded_arr = []
+
+  @discarded_card = ""
+
+  #check what card(s) were discarded from hand and change hand accordingly
+  @hand.each do |h|
+    if h == @discard
+      discarded_arr.push(h)
+    end
+  end
+
+  @curr_hand = []
+  @hand.each do |h|
+    @curr_hand.push(h.fetch("code"))
+  end
+  @discarded_card = discarded_arr.join(",")
+
+   
+  @text.push("You discarded the #{discarded_value} of #{discarded_suit}")
+   
+
+
+end # end for random if  
 
   cookies[:discard_pile] = @discard_pile.join(",")
 
