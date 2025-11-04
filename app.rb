@@ -35,18 +35,21 @@ def largest_hash_key(hash)
 end
 
  # make it so when discard button is pressed, random able card is discarded or at least chosen
- def discard()
+ def discard(arr)
+h_arr = []
+rand_index = 0
 
-  if @hand != nil
-    h_arr = @hand.select {|h| !@disabled_arr.include?(h)}
+    h_arr = arr.select {|h| !@disabled_arr.include?(h)}
 
     rand_index = rand(0..h_arr.length-1)
-    return h_arr[rand_index] # so i think i either need to put this whole function after the if statement for discarding as part of the else statement or something and @hand array will have to be an array which takes from whatever array is being worked on in if ace king statement
+    # return h_arr[rand_index] # so i think i either need to put this whole function after the if statement for discarding as part of the else statement or something and @hand array will have to be an array which takes from whatever array is being worked on in if ace king statement
     # h_arr is image which would be randomly chosen so add to discard pile
 
-  end
+  # end
   # if @hand_arr != nil
+  return h_arr[rand_index]
 end
+
 #only goes in game
 def cpu()
   deck = cookies[:deck_id]
@@ -551,6 +554,9 @@ get("/game") do
     cookies[:hand] = (@code_arr.join(","))
   end
 
+  # send hand array to discard action to be used for choosing random card to discard
+  cookies[:random_hand] = @card_arr.join(",")
+
   pile_name = "hand"
 
   #add hand before discarding from pile is this necessary? idk i could just add the cards to the pile but whatever or i could make the pile in the game action
@@ -808,7 +814,7 @@ cookies[:disc_val] = discarded_value
 
 
   end #end of if for params?
-end # end for random if  
+
   pile_name = "hand"
   hand_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
   @hand = api_response(hand_list, "piles").fetch(pile_name).fetch("cards")
@@ -844,6 +850,38 @@ end # end for random if
   else
    cpu_length = 0
   end
+
+end # end for random if  
+
+  rand_hand = cookies[:random_hand].split(",")
+
+  val = cookies[:]
+
+  # check to see what cards would be disabled
+  if !(c.fetch("value") == top_val || c.fetch("suit") == top_suit || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
+       
+      disabled_arr.push(c)
+    end
+    # change disable arr to be arg for discard()
+  #discard card from hand
+  rand_card = discard(rand_hand)
+
+  rand_code = rand_card.gsub(/[A-Z]/, "")  
+
+  # drwing from hand here
+    pile_name = "hand"
+
+    #draw from the pile which would be discarding in this case; this discards chosen card from hand
+    pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + rand_code
+
+    d_res = api_response(pile, "cards")
+
+  
+  discard_pile.push(rand_card)
+
+
+
+
   #not sure where to put this
   cpu_action(discarded_value, discarded_suit)
 
@@ -942,13 +980,13 @@ end # end for random if
   ################################################### end of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
 
   # no card was chosen so choose a random card
-  else
+  # else
 
-    #take random card
-@discard_pile.push(discard())
+#     #take random card
+# @discard_pile.push(discard())
 
 
-puts "random discard is " + discard()
+# puts "random discard is " + discard()
 # push to discard pile
 
 # remove from hand
@@ -979,7 +1017,7 @@ pile_name = "hand"
    
 
 
-end # end for random if  
+# end # end for random if  
 
   cookies[:discard_pile] = @discard_pile.join(",")
 
