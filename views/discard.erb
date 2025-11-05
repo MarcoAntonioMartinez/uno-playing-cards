@@ -24,6 +24,9 @@
 
     <% @hand_arr.each_with_index do |c, i| %>
 
+      <% if @random%>
+      < code for displaying array of cards goes here im assuming it will be the same code as below?>
+
       <% if @disable[i]%>
 
         <ul>
@@ -54,6 +57,7 @@
         </ul>
       <% end %> <!-- end of if -->
     <% end %> <!-- end of loop -->
+      <% end %> <!-- end of if for random -->
   </div>
 </div>
 
