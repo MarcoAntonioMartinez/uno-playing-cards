@@ -18,7 +18,6 @@ def api_response(url, key)
   return fetched_key = parsed_response.fetch(key)
 end
 
- 
 def new_deck(url)
   deck = api_response(url, "deck_id")
 
@@ -27,23 +26,21 @@ def new_deck(url)
   # DECK_ID = deck
 end
 
- 
-
 #get max value from hash
 def largest_hash_key(hash)
   hash.max_by { |k, v| v }
 end
 
- # make it so when discard button is pressed, random able card is discarded or at least chosen
- def discard(arr)
-h_arr = []
-rand_index = 0
+# make it so when discard button is pressed, random able card is discarded or at least chosen
+def discard(arr, disc_arr)
+  h_arr = []
+  rand_index = 0
 
-    h_arr = arr.select {|h| !@disabled_arr.include?(h)}
+  h_arr = arr.select { |h| !disc_arr.include?(h) }
 
-    rand_index = rand(0..h_arr.length-1)
-    # return h_arr[rand_index] # so i think i either need to put this whole function after the if statement for discarding as part of the else statement or something and @hand array will have to be an array which takes from whatever array is being worked on in if ace king statement
-    # h_arr is image which would be randomly chosen so add to discard pile
+  rand_index = rand(0..h_arr.length - 1)
+  # return h_arr[rand_index] # so i think i either need to put this whole function after the if statement for discarding as part of the else statement or something and @hand array will have to be an array which takes from whatever array is being worked on in if ace king statement
+  # h_arr is image which would be randomly chosen so add to discard pile
 
   # end
   # if @hand_arr != nil
@@ -59,7 +56,6 @@ def cpu()
   # puts "cpu url is #{cpu_url}"
   cpu_cards = api_response(cpu_url, "cards")
 
-  
   @cpu_card_arr = []
 
   @cpu_code_arr = []
@@ -72,7 +68,6 @@ def cpu()
 
     values.push(c.fetch("value"))
     suits.push(c.fetch("suit"))
-   
   end
 
   cookies[:cpu_cards] = (@cpu_card_arr.join(","))
@@ -80,7 +75,6 @@ def cpu()
   cookies[:cpu_codes] = @cpu_code_arr.join(",")
   cookies[:cpu_values] = (values.join(","))
   cookies[:cpu_suits] = (suits.join(","))
- 
 
   cpu_hand = @cpu_code_arr.join(",")
   pile_name = "cpu_hand"
@@ -95,15 +89,12 @@ def cpu()
 
   @c_image = []
 
-  
   cards_res.each do |c|
     @c_image.push(c.fetch("image"))
-   
   end
 
-   
   ################################################### end of making cpu hand
-   
+
   cookies[:cpu_turns] = 0
 
   session[:player_turn] = true
@@ -112,7 +103,6 @@ end
 ####################################################################################################################
 
 def cpu_action(value, suit)
-   
   deck = cookies[:deck_id]
 
   pile_name = "cpu_hand"
@@ -120,18 +110,17 @@ def cpu_action(value, suit)
   @cpu_h_cards = api_response(pile, "piles").fetch(pile_name).fetch("cards")
 
   cpu_h_codes = []
-   
+
   values = []
   suits = []
 
   @cpu_h_cards.each do |c|
     cpu_h_codes.push(c.fetch("code"))
-     values.push(c.fetch("value"))
+    values.push(c.fetch("value"))
     suits.push(c.fetch("suit"))
   end
   deck = cookies[:deck_id]
 
-   
   #variable true if cpu has discarded all necessary cards
   has_discarded = false
 
@@ -141,9 +130,9 @@ def cpu_action(value, suit)
   session[:jack_used] = false
   session[:queen_used] = false
 
- k_arr = cookies[:king_arr].split(",")
-  a_arr =cookies[:ace_arr].split(",")
-  
+  k_arr = cookies[:king_arr].split(",")
+  a_arr = cookies[:ace_arr].split(",")
+
   spade_indx = 0
   clubs_indx = 1
   diamond_indx = 2
@@ -151,7 +140,6 @@ def cpu_action(value, suit)
 
   @cpu_discarded = true
 
- 
   cpu_turns = cookies[:cpu_turns].to_i
 
   if cpu_turns == 3
@@ -162,18 +150,12 @@ def cpu_action(value, suit)
 
   return if cpu_turns > 3
 
-   # if last discarded card was a jack or queen the cpu skips its turn
+  # if last discarded card was a jack or queen the cpu skips its turn
   if ((value == "JACK" || value == "QUEEN") && session[:player_turn] == true)
 
-   
     # @text.push("Player discarded a #{value}, skipping the CPU's turn.")
-    
-
-     
 
     jq_cnt += 1
-     
-
   else
     heart_cnt = 0
     dmnd_cnt = 0
@@ -182,8 +164,6 @@ def cpu_action(value, suit)
 
     session[:jack_used] = false
     session[:queen_used] = false
-
-     
 
     #count how many of each suit there is to determine what to change the king/ace into
     suits.each do |s|
@@ -219,19 +199,18 @@ def cpu_action(value, suit)
         elsif v == club_cnt
           max_suit = "CLUBS"
         else
-           
         end #case
       end #if
     end #each_value
-     
+
     #checked is card that was discarded so if i try to match it to this hand that means checked is player 1 discard so cpu has to match it checked has code so
     discarded = ""
-     
+
     cant_discard = false
-    
+
     #has all cards that can be discarded
     cpu_can_discard = []
-    
+
     cpu_d_val = ""
     cpu_d_suit = ""
 
@@ -244,7 +223,6 @@ def cpu_action(value, suit)
       end
     end
 
-    
     cookies[:cpu_val] = cpu_d_val
     cookies[:cpu_suit] = cpu_d_suit
 
@@ -267,9 +245,9 @@ def cpu_action(value, suit)
       drawn_cpu_value = cpu_draw.fetch("value")
       drawn_cpu_suit = cpu_draw.fetch("suit")
 
-      @dis_val = cookies[:disc_val] 
-  @dis_suit = cookies[:disc_suit] 
-     
+      @dis_val = cookies[:disc_val]
+      @dis_suit = cookies[:disc_suit]
+
       pile_name = "cpu_hand"
       #add to cpu_hand
       pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + drawn_cpu_card
@@ -277,9 +255,8 @@ def cpu_action(value, suit)
 
       # to prevent card from being discarded if cpu has drawn a card
       # has_discarded = true
-      
+
       @text.push("\n\nCPU draws #{drawn_cpu_value} of #{drawn_cpu_suit}")
-       
     else # if able to discard check aces, kings and out side of that discard the card
       #discard card maybe need to put in beginning or osmehting
 
@@ -287,7 +264,7 @@ def cpu_action(value, suit)
       #var to hold discarded king
       dis_c_king = ""
       king_img = ""
-      if discarded == "KC" || discarded == "KH" || discarded == "KD" || discarded == "KS" 
+      if discarded == "KC" || discarded == "KH" || discarded == "KD" || discarded == "KS"
         dis_king_val = "KING"
         case max_suit
         when "HEARTS"
@@ -328,14 +305,12 @@ def cpu_action(value, suit)
         @discard_pile.push(king_img)
 
         cookies[:disc_val] = dis_king_val
-  cookies[:disc_suit] = dis_king_suit
+        cookies[:disc_suit] = dis_king_suit
 
-         
         @text.push("\n\nCPU discards #{dis_king_val} of #{dis_king_suit}")
         #only add session:text to text if action is not draw for player
-  
-        
-      elsif discarded == "AC" || discarded == "AH" || discarded == "AD" || discarded == "AS" 
+
+      elsif discarded == "AC" || discarded == "AH" || discarded == "AD" || discarded == "AS"
         ace_img = []
         dis_ace_val = "ACE"
 
@@ -368,8 +343,7 @@ def cpu_action(value, suit)
         has_discarded = true
 
         puts "max suit in ace if is #{max_suit}"
-        
-        
+
         pile_name = "deck"
         draw_4 = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?count=4"
         draw_4_cards = api_response(draw_4, "cards")
@@ -384,10 +358,9 @@ def cpu_action(value, suit)
         pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + d4_cards
         api_response(pile, "piles")
 
-         
         @discard_pile.push(ace_img)
-                cookies[:disc_val] = dis_ace_val
-  cookies[:disc_suit] = dis_ace_suit
+        cookies[:disc_val] = dis_ace_val
+        cookies[:disc_suit] = dis_ace_suit
         @text.push("\n\nCPU discards #{dis_ace_val} of #{dis_ace_suit}")
         # puts "this does twice apparently"
         #ok so maybe i need to do if statment for discard pile pushing like bool variable when king or ace img has been discarded
@@ -410,14 +383,12 @@ def cpu_action(value, suit)
         #discard by pushing to array
         @discard_pile.push(discarded_cpu.fetch("image"))
 
-        
         # add value and suit to variables so can be used to properly chose card to discard
         @dis_val = discarded_cpu.fetch("value")
         @dis_suit = discarded_cpu.fetch("suit")
 
-                cookies[:disc_val] = @dis_val
-  cookies[:disc_suit] = @dis_suit
-
+        cookies[:disc_val] = @dis_val
+        cookies[:disc_suit] = @dis_suit
 
         # if session[:text] != nil
         #   if session[:text].is_a?(String)
@@ -431,18 +402,15 @@ def cpu_action(value, suit)
           cpu_turns += 1
           cpu_action(cpu_d_val, cpu_d_suit)
         end
-
-        
       end # end if to check if card was already discarded from cpu_hand
     end #if for can't discard
   end # end for jack / queen
-   
+
   # end # if with jack/queen
 
   # end # if for jac/queen
   session[:jack_used] = false
   session[:queen_used] = false
- 
 
   pile_name = "cpu_hand"
   @chl_pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
@@ -490,7 +458,7 @@ get("/game") do
   #   if session != {}
   #   session.clear
   # end
-  
+
   # array that has aces in it
   ace_arr = [
     "https://deckofcardsapi.com/static/img/AS.png", "https://deckofcardsapi.com/static/img/AC.png", "https://deckofcardsapi.com/static/img/AD.png", "https://deckofcardsapi.com/static/img/AH.png",
@@ -499,10 +467,8 @@ get("/game") do
   # array that has kings in it
   king_arr = ["https://deckofcardsapi.com/static/img/KS.png", "https://deckofcardsapi.com/static/img/KC.png", "https://deckofcardsapi.com/static/img/KD.png", "https://deckofcardsapi.com/static/img/KH.png"]
 
- cookies[:king_arr] = king_arr.join(",")
+  cookies[:king_arr] = king_arr.join(",")
   cookies[:ace_arr] = ace_arr.join(",")
-  
-  
 
   new_deck = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1"
 
@@ -524,7 +490,6 @@ get("/game") do
 
   cards_deck_pile = deck_extra.join(",")
 
-   
   cookies[:deck_id] = deck
 
   #add the 52 cards from the deck
@@ -532,14 +497,12 @@ get("/game") do
 
   pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + cards_deck_pile
   deck_pile = api_response(pile, "piles")
-   
 
   #start game by drawing 7 cards
   pile_name = "deck"
   start_game = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?count=7"
   re = api_response(start_game, "cards")
 
- 
   cards = re
 
   @card_arr = []
@@ -563,15 +526,12 @@ get("/game") do
   @pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + cookies[:hand]
 
   rea = api_response(@pile, "success")
-  
+
   cpu()
-   
 
   ################################################### start of take top card from deck and place on discard pile which starts the game - place on game action
   pile_name = "deck"
   @game_start = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?count=1"
-
-   
 
   #need to get first card
   @first_card = api_response(@game_start, "cards")[0]
@@ -586,14 +546,11 @@ get("/game") do
   @suit = @first_card.fetch("suit")
   # end
 
-   
-
   @discard_pile = []
 
   #add first discard to pile
   @discard_pile.push(@card)
 
-  
   cookies[:discard_pile] = @discard_pile
 
   #make array that's filled with cards that do not match the suit or value of card in discard pile or are not king or ace cards
@@ -627,15 +584,13 @@ get("/game") do
   #maybe this part needs to be in draw action
   #how to make this true when button is pressed
   #only draw when all cards are disabled actually might need to do something else here like if draw exists in params idk
- 
+
   ################################################### end of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
 
   ################################################### end of take top card from deck and place on discard pile which starts the game - place on game action
 
   ################################################### start of discard only 1 card at a time - place on game action
   ################################################### end of discard only 1 card at a time - place on game action
-
-  
 
   erb(:game)
 end
@@ -652,16 +607,15 @@ get("/discard") do
     arr.each do |a|
       if a != @discard_pile.last
         @discard_pile.push(a)
-        
       end
     end
   end
-  
+
   #if no card was chosen then push random  card to discard pile
   #card to be discarded
   #i forgot to do the push and make it uncommented so do that for next time
   if params.empty? != true
-  @discard = params.key("on")
+    @discard = params.key("on")
   else
     @random = true
     # @discard_pile.push(discard())
@@ -689,198 +643,249 @@ get("/discard") do
   @dis_val = ""
   @dis_suit = ""
 
-   
+  @disabled_arr = []
 
+  # array for holding true false vals for disabled
+  @is_disabled = []
   discarded_value = ""
-    discarded_suit = ""
+  discarded_suit = ""
   #if to check which king card is being discarded; it would be chosen from button so fetch king
   if !@random
+    if params.key?("king")
+      # i will most likely have to disable discard when king is selected in hand
+      king_p = params.fetch("king")
 
-  if params.key?("king")
-    # i will most likely have to disable discard when king is selected in hand
-    king_p = params.fetch("king")
+      case king_p
+      when "KS"
+        discarded_value = "KING"
+        discarded_suit = "SPADES"
+        king_img = k_arr[spade_indx]
+      when "KC"
+        discarded_value = "KING"
+        discarded_suit = "CLUBS"
+        king_img = k_arr[clubs_indx]
+      when "KH"
+        discarded_value = "KING"
+        discarded_suit = "HEARTS"
+        king_img = k_arr[heart_indx]
+      when "KD"
+        discarded_value = "KING"
+        discarded_suit = "DIAMONDS"
+        king_img = k_arr[diamond_indx]
+      end
 
-    
-    case king_p
-    when "KS"
-      discarded_value = "KING"
-      discarded_suit = "SPADES"
-      king_img = k_arr[spade_indx]
-    when "KC"
-      discarded_value = "KING"
-      discarded_suit = "CLUBS"
-      king_img = k_arr[clubs_indx]
-    when "KH"
-      discarded_value = "KING"
-      discarded_suit = "HEARTS"
-      king_img = k_arr[heart_indx]
-    when "KD"
-      discarded_value = "KING"
-      discarded_suit = "DIAMONDS"
-      king_img = k_arr[diamond_indx]
-    end
+      @code_arr.push(king_p)
 
-    @code_arr.push(king_p)
+      pile_name = "hand"
+      #need to draw king from hand and do not add to discard just add back to deck pile unless kingcnt = 4 then return to deck then draw new king from deck and that to discard
+      king_hd = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + @discard
+      api_response(king_hd, "success")
 
-    pile_name = "hand"
-    #need to draw king from hand and do not add to discard just add back to deck pile unless kingcnt = 4 then return to deck then draw new king from deck and that to discard
-    king_hd = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + @discard
-    api_response(king_hd, "success")
-
-     
-    # and add new king to discard pile
-    @discard_pile.push(king_img)
+      # and add new king to discard pile
+      @discard_pile.push(king_img)
       cookies[:disc_val] = discarded_value
-  cookies[:disc_suit] = discarded_suit
+      cookies[:disc_suit] = discarded_suit
+    elsif params.key?("ace")
+      ace_p = params.fetch("ace")
 
-     
+      case ace_p
+      when "AS"
+        discarded_value = "ACE"
+        discarded_suit = "SPADES"
+        ace_img = a_arr[spade_indx]
+      when "AC"
+        discarded_value = "ACE"
+        discarded_suit = "CLUBS"
+        ace_img = a_arr[clubs_indx]
+      when "AH"
+        discarded_value = "ACE"
+        discarded_suit = "HEARTS"
+        ace_img = a_arr[heart_indx]
+      when "AD"
+        discarded_value = "ACE"
+        discarded_suit = "DIAMONDS"
+        ace_img = a_arr[diamond_indx]
+      end
 
-  elsif params.key?("ace")
-    ace_p = params.fetch("ace")
+      @code_arr.push(ace_p)
 
-    case ace_p
-    when "AS"
-      discarded_value = "ACE"
-      discarded_suit = "SPADES"
-      ace_img = a_arr[spade_indx]
-    when "AC"
-      discarded_value = "ACE"
-      discarded_suit = "CLUBS"
-      ace_img = a_arr[clubs_indx]
-    when "AH"
-      discarded_value = "ACE"
-      discarded_suit = "HEARTS"
-      ace_img = a_arr[heart_indx]
-    when "AD"
-      discarded_value = "ACE"
-      discarded_suit = "DIAMONDS"
-      ace_img = a_arr[diamond_indx]
-    end
+      pile_name = "hand"
+      #need to draw king from hand and do not add to discard just add back to deck pile unless kingcnt = 4 then return to deck then draw new king from deck and that to discard
+      ace_hd = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + @discard
+      api_response(ace_hd, "success")
 
-    @code_arr.push(ace_p)
+      pile_name = "deck"
+      draw_4 = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?count=4"
+      draw_4_cards = api_response(draw_4, "cards")
 
-     pile_name = "hand"
-    #need to draw king from hand and do not add to discard just add back to deck pile unless kingcnt = 4 then return to deck then draw new king from deck and that to discard
-    ace_hd = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + @discard
-    api_response(ace_hd, "success")
+      d4 = []
+      draw_4_cards.each do |d|
+        d4.push(d.fetch("code"))
+      end
+      d4_cards = d4.join(",")
 
-     pile_name = "deck"
-        draw_4 = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?count=4"
-        draw_4_cards = api_response(draw_4, "cards")
+      pile_name = "cpu_hand"
+      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + d4_cards
+      api_response(pile, "piles")
 
-        d4 = []
-        draw_4_cards.each do |d|
-          d4.push(d.fetch("code"))
-        end
-        d4_cards = d4.join(",")
+      @discard_pile.push(ace_img)
+      cookies[:disc_val] = discarded_value
+      cookies[:disc_suit] = discarded_suit
+    else # no king value to be discarded so discard normally
+      if cookies[:cpu_val] != nil
+        cpu_val = cookies[:cpu_val]
+      end
 
-        pile_name = "cpu_hand"
-        pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + d4_cards
-        api_response(pile, "piles")
+      # drwing from hand here
+      pile_name = "hand"
 
+      #draw from the pile which would be discarding in this case; this discards chosen card from hand
+      pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + @discard
 
-@discard_pile.push(ace_img)
-cookies[:disc_val] = discarded_value
-  cookies[:disc_suit] = discarded_suit
+      d_res = api_response(pile, "cards")
 
-  else # no king value to be discarded so discard normally
-    if cookies[:cpu_val] != nil
-      cpu_val = cookies[:cpu_val]
-    end
- 
-    # drwing from hand here
+      discarded_img = ""
+      discarded_code = ""
+      d_res.each do |d|
+        discarded_value = d.fetch("value")
+        discarded_suit = d.fetch("suit")
+        discarded_img = d.fetch("image")
+        discarded_code = d.fetch("code")
+      end
+      #discard
+
+      @discard_pile.push(discarded_img)
+      @code_arr.push(discarded_code)
+      cookies[:disc_val] = discarded_value
+      cookies[:disc_suit] = discarded_suit
+    end #end of if for params?
+
     pile_name = "hand"
+    hand_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+    @hand = api_response(hand_list, "piles").fetch(pile_name).fetch("cards")
 
-    #draw from the pile which would be discarding in this case; this discards chosen card from hand
-    pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + @discard
+    discarded_arr = []
 
-    d_res = api_response(pile, "cards")
+    @discarded_card = ""
 
- 
-    discarded_img = ""
-    discarded_code = ""
-    d_res.each do |d|
-      discarded_value = d.fetch("value")
-      discarded_suit = d.fetch("suit")
-      discarded_img = d.fetch("image")
-      discarded_code = d.fetch("code")
+    #check what card(s) were discarded from hand and change hand accordingly
+    @hand.each do |h|
+      if h == @discard
+        discarded_arr.push(h)
+      end
     end
-    #discard
 
-    @discard_pile.push(discarded_img)
-    @code_arr.push(discarded_code)
-    cookies[:disc_val] = discarded_value
-  cookies[:disc_suit] = discarded_suit
-
-
-  end #end of if for params?
-
-  pile_name = "hand"
-  hand_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
-  @hand = api_response(hand_list, "piles").fetch(pile_name).fetch("cards")
-
-  discarded_arr = []
-
-  @discarded_card = ""
-
-  #check what card(s) were discarded from hand and change hand accordingly
-  @hand.each do |h|
-    if h == @discard
-      discarded_arr.push(h)
+    @curr_hand = []
+    @hand.each do |h|
+      @curr_hand.push(h.fetch("code"))
     end
-  end
+    @discarded_card = discarded_arr.join(",")
 
-  @curr_hand = []
-  @hand.each do |h|
-    @curr_hand.push(h.fetch("code"))
-  end
-  @discarded_card = discarded_arr.join(",")
+    ## ################# hand pile            maybe i dont need to get the parsed response when im adding cards to piles
 
-  ## ################# hand pile            maybe i dont need to get the parsed response when im adding cards to piles
+    @text.push("You discarded the #{discarded_value} of #{discarded_suit}")
 
-   
-  @text.push("You discarded the #{discarded_value} of #{discarded_suit}")
-   
+    session[:player_turn] = true
 
-  session[:player_turn] = true
-  
-  #save it so can tell if cpu drew a card
-  if @new_images != nil
-  cpu_length = @new_images.length
-  else
-   cpu_length = 0
-  end
+    #save it so can tell if cpu drew a card
+    if @new_images != nil
+      cpu_length = @new_images.length
+    else
+      cpu_length = 0
+    end
+  else # random if
 
-end # end for random if  
+pile_name = "hand"
+    hand_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+    @hand = api_response(hand_list, "piles").fetch(pile_name).fetch("cards")
 
-  rand_hand = cookies[:random_hand].split(",")
 
-  val = cookies[:]
+    last_card = @discard_pile.last
 
-  # check to see what cards would be disabled
-  if !(c.fetch("value") == top_val || c.fetch("suit") == top_suit || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
-       
-      disabled_arr.push(c)
+    last_code = last_card.gsub(/[A-Z]/, "")
+
+    rand_code = last_code.split("")
+
+    case rand_code[0]
+    when "A"
+      discarded_value = "ACE"
+    when "K"
+      discarded_value = "KING"
+    else
+      discarded_value = rand_code[0]
+    end
+
+    case rand_code[1]
+    when "H"
+      discarded_suit = "HEARTS"
+    when "D"
+      discarded_suit = "DIAMONDS"
+    when "S"
+      discarded_suit = "SPADES"
+    when "C"
+      discarded_suit = "CLUBS"
+    end
+
+    top_val = discarded_value
+    top_suit = discarded_suit
+
+    @rand_disabled = []
+
+    @hand.each do |c|
+      # check to see what cards would be disabled
+      if !(c.fetch("value") == top_val || c.fetch("suit") == top_suit || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
+        @rand_disabled.push(c)
+      end
     end
     # change disable arr to be arg for discard()
-  #discard card from hand
-  rand_card = discard(rand_hand)
+    #discard card from hand
+    rand_card = discard(@hand, @rand_disabled)
 
-  rand_code = rand_card.gsub(/[A-Z]/, "")  
+    rand_code = rand_card.fetch("image").gsub(/[^A-Z]/, "")
 
-  # drwing from hand here
+    rand_img = rand_card.fetch("image")
+
+    # drwing from hand here
     pile_name = "hand"
 
     #draw from the pile which would be discarding in this case; this discards chosen card from hand
     pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/draw/?cards=" + rand_code
 
+    puts rand_code
     d_res = api_response(pile, "cards")
 
-  
-  discard_pile.push(rand_card)
+    @discard_pile.push(rand_img)
 
+    # disabled stuff
+    @r_cards = []
+    @hand.each do |c|
+      # check to see what cards would be disabled
+      if !(c.fetch("value") == top_val || c.fetch("suit") == top_suit || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
+        @rand_disabled.push(c)
+        @r_cards.push(c.fetch("image"))
+      end
 
+      if @rand_disabled.include?(c)
+        @is_disabled.push(true)
+      else
+        @is_disabled.push(false)
+      end
+    end # hand each
 
+    c = @r_cards.join(",")
+    d = @disabled_arr.join(",")
+
+    cookies[:disable] = @is_disabled.join(",")
+
+    @disable_button = false
+    if c == d
+      @disable_button = true
+    end
+  end # end for random if
+
+  # rand_hand = cookies[:random_hand].split(",")
+
+  # val = cookies[:]
 
   #not sure where to put this
   cpu_action(discarded_value, discarded_suit)
@@ -912,7 +917,6 @@ end # end for random if
 
   ############# end of hand pile
 
-  
   d = URI.decode_www_form_component(cookies[:discard_pile])
   arr = d.split(",")
   # puts arr.last
@@ -931,104 +935,100 @@ end # end for random if
   top_code = @top_discard.gsub(/[A-Z]/, "")
 
   cookies[:top_code] = top_code
+
+  # if cpu cards well it has to do with when drawing instead of discarding on first turn
   if cpu_length != @new_images.length + 1
-        top_val = cookies[:disc_val] 
-  top_suit = cookies[:disc_suit] 
-  else
+    top_val = cookies[:disc_val]
+    top_suit = cookies[:disc_suit]
+  else # otherwise top_val is what was just discarded bc cpu didnt discard
     top_val = discarded_value
     top_suit = discarded_suit
   end
 
-
-   #make it so the cards that do not match the most recent card are disabled
+  #make it so the cards that do not match the most recent card are disabled
 
   #make array that's filled with cards that do not match the suit or value of card in discard pile or are not king or ace cards
-  @disabled_arr = []
-  @disable = []
-  #has code for cards in hand
-  @cards.each_with_index do |c, i|
+  if !@random
+    @disabled_arr = []
 
-    #this code should still work with this project I think i just need to change the whole thing from checkboxes to radio buttons bc i only need to choose one
-    # if !(c.fetch("value") == @top_discard["value"] || c.fetch("suit") == @top_discard["suit"] || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
-    if !(c.fetch("value") == top_val || c.fetch("suit") == top_suit || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
-       
-      @disabled_arr.push(c)
+    #has code for cards in hand
+    @cards.each_with_index do |c, i|
+
+      # if !(c.fetch("value") == @top_discard["value"] || c.fetch("suit") == @top_discard["suit"] || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
+      if !(c.fetch("value") == top_val || c.fetch("suit") == top_suit || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
+        @disabled_arr.push(c)
+      end
+
+      if @disabled_arr.include?(c)
+        @is_disabled.push(true)
+      else
+        @is_disabled.push(false)
+      end
     end
 
-    if @disabled_arr.include?(c)
-      @disable.push(true)
-    else
-      @disable.push(false)
+    c = @cards.join(",")
+    d = @disabled_arr.join(",")
+
+    cookies[:disable] = @disable.join(",")
+
+    ######################################### end of disabled logic
+
+    ################################################### start of take discarded card and place on discard pile do action if necessary - either suit must match or value must match
+    ################################################### end of take discarded card and place on discard pile do action if necessary - either suit must match or value must match
+
+    ################################################### start of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action maybe dont need bc i disable cards
+    @disable_button = false
+    if c == d
+      @disable_button = true
     end
-  end
+    ################################################### end of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
 
-  c = @cards.join(",")
-  d = @disabled_arr.join(",")
+    # no card was chosen so choose a random card
+    # else
 
-  cookies[:disable] = @disable.join(",")
+    #   #     #take random card
+    #   #array for displaying hand and array which has disabled
+    #   @discard_pile.push(discard())
 
-  ######################################### end of disabled logic
+    #   puts "random discard is " + discard()
+    #   # push to discard pile
 
-  ################################################### start of take discarded card and place on discard pile do action if necessary - either suit must match or value must match
-  ################################################### end of take discarded card and place on discard pile do action if necessary - either suit must match or value must match
+    #   # remove from hand
+    #   #make function for this
+    #   #discard card, add to discard pile, call cpuaction
+    #   pile_name = "hand"
+    #   hand_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
+    #   @hand = api_response(hand_list, "piles").fetch(pile_name).fetch("cards")
 
-  ################################################### start of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action maybe dont need bc i disable cards
-  @disable_button = false
-  if c == d
-    @disable_button = true
-  end
-  ################################################### end of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
+    #   discarded_arr = []
 
-  # no card was chosen so choose a random card
-  # else
+    #   @discarded_card = ""
 
-#     #take random card
-# @discard_pile.push(discard())
+    #   #check what card(s) were discarded from hand and change hand accordingly
+    #   @hand.each do |h|
+    #     if h == @discard
+    #       discarded_arr.push(h)
+    #     end
+    #   end
 
+    #   @curr_hand = []
+    #   @hand.each do |h|
+    #     @curr_hand.push(h.fetch("code"))
+    #   end
+    #   @discarded_card = discarded_arr.join(",")
 
-# puts "random discard is " + discard()
-# push to discard pile
-
-# remove from hand
-#make function for this
-pile_name = "hand"
-  hand_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
-  @hand = api_response(hand_list, "piles").fetch(pile_name).fetch("cards")
-
-  discarded_arr = []
-
-  @discarded_card = ""
-
-  #check what card(s) were discarded from hand and change hand accordingly
-  @hand.each do |h|
-    if h == @discard
-      discarded_arr.push(h)
-    end
-  end
-
-  @curr_hand = []
-  @hand.each do |h|
-    @curr_hand.push(h.fetch("code"))
-  end
-  @discarded_card = discarded_arr.join(",")
-
-   
-  @text.push("You discarded the #{discarded_value} of #{discarded_suit}")
-   
-
-
-# end # end for random if  
+    #   @text.push("You discarded the #{discarded_value} of #{discarded_suit}")
+  end # end for random if
 
   cookies[:discard_pile] = @discard_pile.join(",")
 
-  top_val = cookies[:disc_val] 
+  top_val = cookies[:disc_val]
   top_suit = cookies[:disc_suit]
 
   erb(:discard)
 end
 
 get("/draw") do
- 
 
   ################################################### start of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
   deck = cookies[:deck_id]
@@ -1045,8 +1045,6 @@ get("/draw") do
 
   #make sure cookies gets updated
   cookies[:count] = count
-
-  
 
   @begin = @add_card
 
@@ -1087,16 +1085,13 @@ get("/draw") do
     @hand_objs.push(Hand.new(h.fetch("code"), h.fetch("image"), h.fetch("value"), h.fetch("suit")))
   end
   #in above hand each add everything necessary to array of objects
-  
 
   ################################################### end of making draw work
 
   ################################################### start of disabled logic
 
-   
-
   @discard_pile = cookies[:discard_pile].split(",")
-   
+
   @discard_pile.each_with_index do |d, i|
     if i == @discard_pile.length - 1
       @top_discard = d #image need code,value,suit
@@ -1121,18 +1116,15 @@ get("/draw") do
 
   images = []
 
-   @text = []
-   
+  @text = []
 
   @text.push("You drew a card") #discarded the #{discarded_value} of #{discarded_suit}")
-
-   
 
   #make array that's filled with cards that do not match the suit or value of card in discard pile or are not king or ace cards
   @disabled_arr = []
   @disable = []
 
-          top_val = cookies[:disc_val] 
+  top_val = cookies[:disc_val]
   top_suit = cookies[:disc_suit]
 
   #has code for cards in hand
@@ -1168,22 +1160,19 @@ get("/draw") do
   cpu_action(top_val, top_suit)
 
   #try to update value and suit to make discarding in draw work
-    cookies[:disc_val] = top_val 
-    cookies[:disc_suit] = top_suit
+  cookies[:disc_val] = top_val
+  cookies[:disc_suit] = top_suit
 
-    
   erb(:draw)
 end
 
-
 get ("/result") do
+  fetched = params.fetch(result)
 
-fetched = params.fetch(result)
-
-if fetched == win
-  @result = win
-else
-  @result = lose
-end
+  if fetched == win
+    @result = win
+  else
+    @result = lose
+  end
   erb(:result)
 end
