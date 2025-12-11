@@ -250,16 +250,17 @@ label img {
 
 :checked+label:before {
   /* content: "✓"; */
-  /* background-color: grey; */
+  background-color: grey;
   /* transform: scale(1); */
 
 }
 
 :checked+label img {
-  /* position: inli; */
-  /* transform: translateY(-20px);  */
-  /* box-shadow: 0 0 5px #333; */
-
+  position: inline; 
+  transform: translateY(-20px); 
+  
+  /* makes sure suit buttons stay hidden */
+  box-shadow: 0 0 5px #333;
 }
 
 .disabled {
@@ -316,7 +317,7 @@ label img {
 .long-content-discard {
   width: 800px;
   /* Wider than container */
-  height: 700px;
+  height: 500px;
   /* Taller than container */
   background-color: lightblue;
   padding: 20px;
@@ -324,7 +325,7 @@ label img {
 
 .king_btns {
   display: none;
-
+transform: translateY(-20px); 
 }
 
 .ace_btns {
