@@ -25,7 +25,6 @@
     <% @hand_arr.each_with_index do |c, i| %>
 
       <%# if @random%>
-      
 
       <% if @is_disabled[i]%>
 
@@ -57,32 +56,16 @@
         </ul>
       <% end %> <!-- end of if -->
     <% end %> <!-- end of loop -->
-      <%# end %> <!-- end of if for random -->
+    <%# end %> <!-- end of if for random -->
   </div>
 </div>
 
-<div class="scroll-container-discard">
-<div class="long-content-discard">
-  <h2> Discard pile</h2>
- 
-  <ul>
-     
-    <% @discard_pile.each_with_index do |c, i| %>
+<p> <%= @cpu_empty %> is cpu empty</p>
 
-      <li>  <label>
-          <img src="<%= c %>" id="<%= @code_arr[i] %>"  /></label>
-      </li>
-    <% end %>
-  </ul>
-
-</div>
-  <p> <%= @cpu_empty %> is cpu empty</p>
-
-   
   <% if @cpu_empty%>
-    <p> <%= @cpu_empty %> is cpu empty</p>
+    
     <button formaction="/result" type="submit" id="result" name="result" value="lose"> discard</button>
-    <label for="next_draw" id="next_draw_img"> <button formaction="/result" type="submit" id="result" name="result" value="lose"> draw</button>
+    <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw">draw</button>
       <img src="https://deckofcardsapi.com/static/img/back.png"  />
     </label>
 
@@ -100,10 +83,45 @@
 
     <% end %>
 
-  <% elsif @hand_arr.length == 1 %>
+  <% elsif @hand_arr.length == 1 && @win %>
     <button formaction="/result" type="submit" id="result" name="result" value="win"> discard</button>
 
+  <% else %>
+
+    <% if @disable_button%>
+      <button disabled> discard</button>
+
+      <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+        <img src="https://deckofcardsapi.com/static/img/back.png"  />
+      </label>
+    <% else %>
+      <button> discard</button>
+      <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+        <img src="https://deckofcardsapi.com/static/img/back.png"  />
+      </label>
+
+    <% end %>
+
   <% end %>
+
+
+<div class="scroll-container-discard">
+  <div class="long-content-discard">
+    <h2> Discard pile</h2>
+
+    <ul>
+
+      <% @discard_pile.each_with_index do |c, i| %>
+
+        <li>  <label>
+            <img src="<%= c %>" id="<%= @code_arr[i] %>"  /></label>
+        </li>
+      <% end %>
+    </ul>
+
   </div>
+</div>
+
+  
 
 </form>
