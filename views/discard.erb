@@ -1,4 +1,9 @@
+<!-- player wins -->
+<% if @win %>
+<form action="/result">
+<% else %>
 <form action="/discard">
+<% end %>
 
   <div class="scroll-container">
 
