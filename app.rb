@@ -35,10 +35,17 @@ end
 def discard(arr, disc_arr)
   h_arr = []
   rand_index = 0
+@can_rand_discard = true
 
+  # h_arr has all cards from arr that are able to be discarded
   h_arr = arr.select { |h| !disc_arr.include?(h) }
 
+  if h_arr == nil
+    puts "arr and disc_arr are equal no card can be discarded"
+    @can_rand_discard = false
+  else
   rand_index = rand(0..h_arr.length - 1)
+  end
   # return h_arr[rand_index] # so i think i either need to put this whole function after the if statement for discarding as part of the else statement or something and @hand array will have to be an array which takes from whatever array is being worked on in if ace king statement
   # h_arr is image which would be randomly chosen so add to discard pile
 
@@ -110,6 +117,9 @@ def cpu_action(value, suit)
   @cpu_h_cards = api_response(pile, "piles").fetch(pile_name).fetch("cards")
 
   cpu_h_codes = []
+
+  # used to determine if player lost when cpu hand has no cards
+  @cpu_empty = false
 
   values = []
   suits = []
@@ -443,6 +453,7 @@ def cpu_action(value, suit)
     @cpu_empty = true
   end
 
+puts "cpu_empty is " + @cpu_empty.to_s
   cookies[:disc_val] = cpu_d_val
   cookies[:disc_suit] = cpu_d_suit
 end #end function
@@ -831,6 +842,7 @@ pile_name = "hand"
 
     @rand_disabled = []
 
+    # push all cards from hand which cant be discarded to @rand_disabled
     @hand.each do |c|
       # check to see what cards would be disabled
       if !(c.fetch("value") == top_val || c.fetch("suit") == top_suit || c.fetch("value") == "KING" || c.fetch("value") == "ACE")
@@ -969,7 +981,14 @@ pile_name = "hand"
     c = @cards.join(",")
     d = @disabled_arr.join(",")
 
-    cookies[:disable] = @disable.join(",")
+    cookies[:disable] = @is_disabled.join(",")
+
+    # if there is nothing in disabled array and there is only one card in hand
+    if @disabled_arr.length == 0 && @hand_arr == 1
+      
+      # then result will become win
+      @win = true
+    end
 
     ######################################### end of disabled logic
 
@@ -1024,6 +1043,8 @@ pile_name = "hand"
 
   top_val = cookies[:disc_val]
   top_suit = cookies[:disc_suit]
+
+  puts "hand_arr length is " + @hand_arr.length.to_s
 
   erb(:discard)
 end
