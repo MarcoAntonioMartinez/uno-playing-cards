@@ -89,7 +89,9 @@ p {
 table,
 caption {
   /* background-color: #fff; */
-  background-color: #0078B8;
+  background-color: #00b840;
+  /*background-color: #243325;*/
+  /*background-color: #0078B8;*/
   border: 1px solid black;
   padding: 10px;
 
@@ -100,7 +102,7 @@ caption {
 th,
 tr,
 td {
-  background-color: #00B89C;
+  background-color: #adfab3;
   border: 1px solid black;
   font-size: 40px;
 }
