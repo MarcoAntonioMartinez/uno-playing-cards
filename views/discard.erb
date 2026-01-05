@@ -65,33 +65,6 @@
   </div>
 </div>
 
-<p> <%= @cpu_empty %> is cpu empty</p>
-
-  <% if @cpu_empty%>
-    
-    <button formaction="/result" type="submit" id="result" name="result" value="lose"> discard</button>
-    <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw">draw</button>
-      <img src="https://deckofcardsapi.com/static/img/back.png"  />
-    </label>
-
-  <%elsif @hand_arr.length >= 1 %>
-    <% if @disable_button%>
-      <button disabled> discard</button>
-      <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
-        <img src="https://deckofcardsapi.com/static/img/back.png"  />
-      </label>
-    <% else %>
-      <button> discard</button>
-      <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
-        <img src="https://deckofcardsapi.com/static/img/back.png"  />
-      </label>
-
-    <% end %>
-
-  <% elsif @hand_arr.length == 1 && @win %>
-    <button formaction="/result" type="submit" id="result" name="result" value="win"> discard</button>
-
-  <% else %>
 
     <% if @disable_button%>
       <button disabled> discard</button>
@@ -107,7 +80,7 @@
 
     <% end %>
 
-  <% end %>
+  <%# end %>
 
 
 <div class="scroll-container-discard">
