@@ -640,6 +640,9 @@ get("/discard") do
 
   d_res = []
 
+# set variable to be used to determine result for game like win or lose
+  @win = false
+
   #these arrs holds all kings and aces used to check if king or ace cpu is looking for is in player's hand
   k_arr = cookies[:king_arr].split(",")
   a_arr = cookies[:ace_arr].split(",")
