@@ -328,6 +328,11 @@ label img {
 .king_btns {
   display: none;
 transform: translateY(-20px); 
+background-size: contain;
+  background-position: center;
+  position: relative;
+  background-repeat: no-repeat;
+  background-color: #ffffff;
 }
 
 .ace_btns {
@@ -335,21 +340,58 @@ transform: translateY(-20px);
 
 }
 
-:checked+label img[id="cKH"]~.king_btns,
-:checked+label img[id="cKD"]~.king_btns,
-:checked+label img[id="cKS"]~.king_btns,
-:checked+label img[id="cKC"]~.king_btns {
-  display: block;
-  border: 1px solid #ccc;
-  /* try to make cropping work */
-  width: 70px;
-  height: 30px;
-  overflow: hidden;
-  /* transform: translateY(20px) */
+ button[id="ks_button"]{
+  background-image: url(/images/KS_symbol.png);
 }
 
-:checked+label img[id="cKH"]~.king_btns img,
-:checked+label img[id="cKD"]~.king_btns img,
+button[id="kc_button"]{
+  background-image: url(/images/KC_symbol.png);
+}
+
+button[id="kh_button"]{
+  background-image: url(/images/KH_symbol.png);
+}
+
+button[id="kd_button"]{
+  background-image: url(/images/KD_symbol.png);
+}
+
+button[id="as_button"]{
+  background-image: url(/images/KS_symbol.png);
+}
+
+button[id="ac_button"]{
+  background-image: url(/images/KC_symbol.png);
+}
+
+button[id="ah_button"]{
+  background-image: url(/images/KH_symbol.png);
+} 
+
+button[id="ad_button"]{
+  background-image: url(/images/KD_symbol.png);
+  background-size:contain;
+  background-position: center;
+  position: relative;
+  
+}
+
+:checked+label button[id="kh_button"],
+:checked+label button[id="kd_button"],
+:checked+label button[id="ks_button"],
+:checked+label button[id="kc_button"] {
+  display: block;
+  border: 2px solid #009e1a48;
+  /* try to make cropping work */
+   width: 50px;
+  height: 30px;
+  
+  /*overflow: hidden;  */
+  /* transform: translateY(20px) */
+} 
+
+/* :checked+label img[id="cKH"]~.king_btns img, */
+/* :checked+label img[id="cKD"]~.king_btns img,
 :checked+label img[id="cKS"]~.king_btns img,
 :checked+label img[id="cKC"]~.king_btns img {
   width: 740px;
@@ -357,14 +399,15 @@ transform: translateY(-20px);
   object-fit: cover;
   /* width: auto;
   height: auto; */
-  margin: -5px 0 0 -10px;
+  /* margin: -5px 0 0 -10px;
   /* transform: translateY(20.9px); */
-  align-items: center;
+  /* align-items: center; */
   /* z-index: 6.17; */
-  align-items: center;
-}
+  /* align-items: center; */
+/* } */ /*/ */
 
 
+/*
 :checked+label img[id="cAH"]~.ace_btns,
 :checked+label img[id="cAD"]~.ace_btns,
 :checked+label img[id="cAS"]~.ace_btns,
@@ -372,13 +415,13 @@ transform: translateY(-20px);
   display: block;
 
   /* try to make cropping work */
-  width: 70px;
+  /*width: 70px;
   height: 30px;
   overflow: hidden;
-
+*/
   /* transform: translateY(20px) */
-}
-
+/* } */
+/*
 :checked+label img[id="cAH"]~.ace_btns img,
 :checked+label img[id="cAD"]~.ace_btns img,
 :checked+label img[id="cAS"]~.ace_btns img,
@@ -387,13 +430,13 @@ transform: translateY(-20px);
   height: 32px;
   /* width: auto;
   height: auto; */
-  margin: -5px 0 0 -10px;
+  /*margin: -5px 0 0 -10px;
   /* transform: translateY(20.9px); */
-  align-items: center;
+  /* align-items: center; 
   /* z-index: 6.17; */
-  align-items: center;
+  /* align-items: center; 
 }
-
+*/
 
 .container {
   width: 100%;
