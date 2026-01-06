@@ -70,13 +70,6 @@
   <% end %>
   -->
 
-  <div>
-    <h2> Discard pile</h2>
-    <% @discard_pile.each_with_index do |c, i| %>
-    <label>  <img src="<%= c %>" id="d<%= i+1 %>"  /></label>
-  <% end %> <!-- end of loop -->
-
-
 <% if @disable_button%>
   <button disabled> discard</button>
   <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
@@ -89,5 +82,14 @@
   </label>
 
 <% end %>
+
+  <div>
+    <h2> Discard pile</h2>
+    <% @discard_pile.each_with_index do |c, i| %>
+    <label>  <img src="<%= c %>" id="d<%= i+1 %>"  /></label>
+  <% end %> <!-- end of loop -->
+
+
+
 </div>
 </form>
