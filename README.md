@@ -1,6 +1,6 @@
 # UNO with Playing Cards
 
-UNO with Playing Cards is a game you can play where the face cards are the special UNO cards. Made using DeckofCardsApi.
+UNO with Playing Cards is a game you can play where the face cards in a standard 52 playing card deck are the special UNO cards. Made using DeckofCardsApi.
 
   
 
