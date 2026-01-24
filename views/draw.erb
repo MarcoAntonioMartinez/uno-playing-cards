@@ -1,16 +1,15 @@
 <form action="/discard">
-  
+
   <div class="scroll-container">
-    
-  <div class="long-content">
-   <%  @text.each do |c| %>
-    <p> <%= c %> </p>
-    <%end%>
-  </div>
+
+    <div class="long-content">
+      <%  @text.each do |c| %>
+        <p> <%= c %> </p>
+      <%end%>
+    </div>
 
   </div>
 
-  
   <div class="op">
     <h2> op's hand</h2>
     <% @new_images.each_with_index do |c,i| %>
@@ -38,19 +37,19 @@
 
           <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>" />
             <label for="card<%= i %>" >
-             <img src="<%= @image[i] %>" id="c<%= @code_arr[i] %>" />
-            
-                <button id="ks_button" name="king" value="KS" class="king_btns"> <img src="/images/KS_symbol.png"/> </button>
-                <button id="kc_button" name="king" value="KC" class="king_btns"> <img src="/images/KC_symbol.png"/> </button>
-                <button id="kh_button" name="king" value="KH" class="king_btns"> <img src="/images/KH_symbol.png"/> </button>
-                <button id="kd_button" name="king" value="KD" class="king_btns"> <img src="/images/KD_symbol.png"/> </button>
+              <img src="<%= @image[i] %>" id="c<%= @code_arr[i] %>" />
 
-                <button id="as_button" name="ace" value="AS" class="ace_btns"> <img src="/images/KS_symbol.png"/> </button>
-                <button id="ac_button" name="ace" value="AC" class="ace_btns"> <img src="/images/KC_symbol.png"/> </button>
-                <button id="ah_button" name="ace" value="AH" class="ace_btns"> <img src="/images/KH_symbol.png"/> </button>
-                <button id="ad_button" name="ace" value="AD" class="ace_btns"> <img src="/images/KD_symbol.png"/> </button>
-            
-              </label>
+              <button id="ks_button" name="king" value="KS" class="king_btns">  </button>
+                <button id="kc_button" name="king" value="KC" class="king_btns">  </button>
+                <button id="kh_button" name="king" value="KH" class="king_btns">  </button>
+                <button id="kd_button" name="king" value="KD" class="king_btns">   </button>
+
+                <button id="as_button" name="ace" value="AS" class="ace_btns">   </button>
+                <button id="ac_button" name="ace" value="AC" class="ace_btns">  </button>
+                <button id="ah_button" name="ace" value="AH" class="ace_btns">  </button>
+                <button id="ad_button" name="ace" value="AD" class="ace_btns">  </button>
+
+            </label>
           </li>
 
         </ul>
@@ -70,26 +69,27 @@
   <% end %>
   -->
 
-<% if @disable_button%>
-  <button disabled> discard</button>
-  <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
-    <img src="https://deckofcardsapi.com/static/img/back.png"  />
-  </label>
-<% else %>
-  <button> discard</button>
-  <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
-    <img src="https://deckofcardsapi.com/static/img/back.png"  />
-  </label>
+  <div class="buttons">
+    <% if @disable_button%>
+      <button disabled> discard</button>
+      <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+        <img src="https://deckofcardsapi.com/static/img/back.png"  />
+      </label>
+    <% else %>
+      <button> discard</button>
+      <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+        <img src="https://deckofcardsapi.com/static/img/back.png"  />
+      </label>
 
-<% end %>
+    <% end %>
+
+  </div>
 
   <div>
     <h2> Discard pile</h2>
     <% @discard_pile.each_with_index do |c, i| %>
-    <label>  <img src="<%= c %>" id="d<%= i+1 %>"  /></label>
-  <% end %> <!-- end of loop -->
+      <label>  <img src="<%= c %>" id="d<%= i+1 %>"  /></label>
+    <% end %> <!-- end of loop -->
 
-
-
-</div>
+  </div>
 </form>
