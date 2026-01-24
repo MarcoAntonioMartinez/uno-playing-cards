@@ -15,7 +15,7 @@
 
   </div>
 
-  <div>
+  <div class="op">
     <h2> op's hand</h2>
     <% @new_images.each_with_index do |c,i| %>
       <input type="checkbox" id="op<%= i %>" name="op<%= i %>" />
@@ -45,15 +45,15 @@
           <li><input type="checkbox" id="card<%= i %>" name="<%= @hand_code[i] %>" />
             <label for="card<%= i %>" >
               <img src="<%= c %>" id="c<%= @hand_code[i] %>"  />
-              <button id="ks_button" name="king" value="KS" class="king_btns"> <img src="/images/KS_symbol.png"/> </button>
-              <button id="kc_button" name="king" value="KC" class="king_btns"> <img src="/images/KC_symbol.png"/> </button>
-              <button id="kh_button" name="king" value="KH" class="king_btns"> <img src="/images/KH_symbol.png"/> </button>
-              <button id="kd_button" name="king" value="KD" class="king_btns"> <img src="/images/KD_symbol.png"/> </button>
+              <button id="ks_button" name="king" value="KS" class="king_btns">  </button>
+                <button id="kc_button" name="king" value="KC" class="king_btns">  </button>
+                <button id="kh_button" name="king" value="KH" class="king_btns">  </button>
+                <button id="kd_button" name="king" value="KD" class="king_btns">   </button>
 
-              <button id="as_button" name="ace" value="AS" class="ace_btns"> <img src="/images/KS_symbol.png"/> </button>
-              <button id="ac_button" name="ace" value="AC" class="ace_btns"> <img src="/images/KC_symbol.png"/> </button>
-              <button id="ah_button" name="ace" value="AH" class="ace_btns"> <img src="/images/KH_symbol.png"/> </button>
-              <button id="ad_button" name="ace" value="AD" class="ace_btns"> <img src="/images/KD_symbol.png"/> </button>
+                <button id="as_button" name="ace" value="AS" class="ace_btns">   </button>
+                <button id="ac_button" name="ace" value="AC" class="ace_btns">  </button>
+                <button id="ah_button" name="ace" value="AH" class="ace_btns">  </button>
+                <button id="ad_button" name="ace" value="AD" class="ace_btns">  </button>
 
             </label>
           </li>
@@ -63,9 +63,9 @@
     <% end %> <!-- end of loop -->
     <%# end %> <!-- end of if for random -->
   </div>
-</div>
+<!--</div>-->
 
-
+<div class="buttons">
     <% if @disable_button%>
       <button disabled> discard</button>
 
@@ -79,13 +79,14 @@
       </label>
 
     <% end %>
-
+</div>
   <%# end %>
 
 
+    <h2> Discard pile</h2>
 <div class="scroll-container-discard">
   <div class="long-content-discard">
-    <h2> Discard pile</h2>
+
 
     <ul>
 
