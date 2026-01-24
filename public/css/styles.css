@@ -53,7 +53,7 @@ div {
   /*just for effect*/
   /* border: 1px solid black; */
   display: inline-block;
-  padding: 40px 40px;
+  /* padding: 40px 40px; */
   /* display: flex; */
   /* justify-content: center; /* Centers horizontally */
   /* align-items: center;    /*Centers vertically */
@@ -125,10 +125,11 @@ table {
   margin-bottom: 20px;
 }
 
-/* .op {
-  display:flex;
-  flex-flow: row
-} */
+ .op { 
+  /* display:flex; */
+  /* flex-flow: row */
+  padding: 0 auto;
+} 
 /* .play { */
 /* justify-content: center; */
 /* width: 100px;
@@ -155,12 +156,24 @@ table {
   font-size: 30px;
 }
 
-.hand {
-  height: 840px;
-  width: 814px;
+ .hand {
+
+  /* height: 400px; */
+  /* width: 600px; */
+  /*  */
   /* display: flex; */
-  /* flex-flow: nowrap; */
-}
+   /* display: inline-block; */
+   padding: 0px 0px; 
+  /* justify-content: left; */
+  flex-flow: wrap;
+  
+  /* margin: 20px 20px; */
+
+
+  img:not(.disabled){
+    border: 2px solid #00b840;
+  }
+} 
 
 .hand>label {
   display: inline;
@@ -181,6 +194,10 @@ table {
 
 }
 
+.buttons{
+  padding-top: 50px;
+}
+
 img {
   cursor: pointer;
   text-decoration: underline;
@@ -189,6 +206,7 @@ img {
 ul {
   list-style-type: none;
   display: inline;
+  padding: 0 0;
 }
 
 li {
@@ -294,6 +312,7 @@ label img {
   height: 300px;
   border: 1px solid #ccc;
   overflow: auto;
+  
   /* Adds scrollbars only when content overflows */
   padding: 10px;
 }
@@ -302,9 +321,14 @@ label img {
   width: 500px;
   /* Wider than container */
   height: 400px;
+ 
   /* Taller than container */
   background-color: lightblue;
   padding: 20px;
+
+  P{
+     text-align: left;
+  }
 }
 
 .scroll-container-discard {
