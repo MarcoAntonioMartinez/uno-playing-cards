@@ -164,6 +164,8 @@ def cpu_action(value, suit)
   if ((value == "JACK" || value == "QUEEN") && session[:player_turn] == true)
 
     # @text.push("Player discarded a #{value}, skipping the CPU's turn.")
+    
+    
 
     jq_cnt += 1
   else
@@ -772,6 +774,10 @@ get("/discard") do
       @code_arr.push(discarded_code)
       cookies[:disc_val] = discarded_value
       cookies[:disc_suit] = discarded_suit
+      puts "discarded_value is #{discarded_value}"
+      puts "discarded_suit is #{discarded_suit}"
+      puts "cookies[:disc_val] is #{cookies[:disc_val]}"
+      
     end #end of if for params?
 
     pile_name = "hand"
