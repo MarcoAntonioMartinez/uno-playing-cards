@@ -125,11 +125,12 @@ table {
   margin-bottom: 20px;
 }
 
- .op { 
+.op {
   /* display:flex; */
   /* flex-flow: row */
   padding: 0 auto;
-} 
+}
+
 /* .play { */
 /* justify-content: center; */
 /* width: 100px;
@@ -156,24 +157,25 @@ table {
   font-size: 30px;
 }
 
- .hand {
+.hand {
 
   /* height: 400px; */
   /* width: 600px; */
   /*  */
   /* display: flex; */
-   /* display: inline-block; */
-   padding: 0px 0px; 
+  /* display: inline-block; */
+  padding: 0px 0px;
   /* justify-content: left; */
   flex-flow: wrap;
-  
+
   /* margin: 20px 20px; */
 
 
-  img:not(.disabled){
+  /* make it more evenly spaced for all cards by adding a border to non disabled cards*/
+  img:not(.disabled) {
     border: 2px solid #00b840;
   }
-} 
+}
 
 .hand>label {
   display: inline;
@@ -194,7 +196,7 @@ table {
 
 }
 
-.buttons{
+.buttons {
   padding-top: 50px;
 }
 
@@ -276,9 +278,9 @@ label img {
 }
 
 :checked+label img {
-  position: inline; 
-  transform: translateY(-20px); 
-  
+  position: inline;
+  transform: translateY(-20px);
+
   /* makes sure suit buttons stay hidden */
   box-shadow: 0 0 5px #333;
 }
@@ -312,7 +314,7 @@ label img {
   height: 300px;
   border: 1px solid #ccc;
   overflow: auto;
-  
+
   /* Adds scrollbars only when content overflows */
   padding: 10px;
 }
@@ -321,13 +323,13 @@ label img {
   width: 500px;
   /* Wider than container */
   height: 400px;
- 
+
   /* Taller than container */
   background-color: lightblue;
   padding: 20px;
 
-  P{
-     text-align: left;
+  P {
+    text-align: left;
   }
 }
 
@@ -351,8 +353,8 @@ label img {
 
 .king_btns {
   display: none;
-transform: translateY(-20px); 
-background-size: contain;
+  transform: translateY(-20px);
+  background-size: contain;
   background-position: center;
   position: relative;
   background-repeat: no-repeat;
@@ -361,8 +363,14 @@ background-size: contain;
 
 .ace_btns {
   display: none;
-
+  transform: translateY(-20px);
+  background-size: contain;
+  background-position: center;
+  position: relative;
+  background-repeat: no-repeat;
+  background-color: #ffffff;
 }
+
 
  button[id="ks_button"]{
   background-image: url(/images/KS_symbol.png);
@@ -394,58 +402,75 @@ button[id="ah_button"]{
 
 button[id="ad_button"]{
   background-image: url(/images/KD_symbol.png);
-  background-size:contain;
+  /* background-size:contain;
   background-position: center;
-  position: relative;
+  position: relative; */
   
 }
 
-:checked+label button[id="kh_button"],
+:checked+label img[id="cKH"]~.king_btns,
+:checked+label img[id="cKD"]~.king_btns,
+:checked+label img[id="cKS"]~.king_btns,
+:checked+label img[id="cKC"]~.king_btns {
+  display: block;
+  border: 2px solid #009e1a48;
+  /* try to make cropping work */
+  width: 50px;
+  height: 30px;
+
+  overflow: hidden;
+  /* transform: translateY(20px) */
+}
+
+/* for buttons the other one is just going for before 
+ :checked+label button[id="kh_button"],
 :checked+label button[id="kd_button"],
 :checked+label button[id="ks_button"],
 :checked+label button[id="kc_button"] {
   display: block;
   border: 2px solid #009e1a48;
-  /* try to make cropping work */
-   width: 50px;
-  height: 30px;
   
-  /*overflow: hidden;  */
-  /* transform: translateY(20px) */
-} 
-
-/* :checked+label img[id="cKH"]~.king_btns img, */
-/* :checked+label img[id="cKD"]~.king_btns img,
-:checked+label img[id="cKS"]~.king_btns img,
-:checked+label img[id="cKC"]~.king_btns img {
+   width: 50px; 
+   height: 30px;
+  
+  overflow: hidden; 
+  
+ }  */
+/* 
+:checked+label img[id="cKH"]~.king_btns ,
+:checked+label img[id="cKD"]~.king_btns ,
+:checked+label img[id="cKS"]~.king_btns ,
+:checked+label img[id="cKC"]~.king_btns  {
   width: 740px;
-  height: 32px;
-  object-fit: cover;
-  /* width: auto;
+  height: 32px; */
+/* object-fit: cover; */
+/* width: auto;
   height: auto; */
-  /* margin: -5px 0 0 -10px;
+/* margin: -5px 0 0 -10px;
   /* transform: translateY(20.9px); */
-  /* align-items: center; */
-  /* z-index: 6.17; */
-  /* align-items: center; */
-/* } */ /*/ */
+/* align-items: center; */
+/* z-index: 6.17; */
+/* align-items: center; */
+/* }  */
 
 
-/*
+
 :checked+label img[id="cAH"]~.ace_btns,
 :checked+label img[id="cAD"]~.ace_btns,
 :checked+label img[id="cAS"]~.ace_btns,
 :checked+label img[id="cAC"]~.ace_btns {
   display: block;
-
+display: block;
+  border: 2px solid #009e1a48;
   /* try to make cropping work */
-  /*width: 70px;
+  width: 50px;
   height: 30px;
+
   overflow: hidden;
-*/
   /* transform: translateY(20px) */
-/* } */
-/*
+}
+
+/* 
 :checked+label img[id="cAH"]~.ace_btns img,
 :checked+label img[id="cAD"]~.ace_btns img,
 :checked+label img[id="cAS"]~.ace_btns img,
@@ -454,13 +479,13 @@ button[id="ad_button"]{
   height: 32px;
   /* width: auto;
   height: auto; */
-  /*margin: -5px 0 0 -10px;
+/*margin: -5px 0 0 -10px;
   /* transform: translateY(20.9px); */
-  /* align-items: center; 
+/* align-items: center; 
   /* z-index: 6.17; */
-  /* align-items: center; 
+/* align-items: center; 
 }
-*/
+
 
 .container {
   width: 100%;
