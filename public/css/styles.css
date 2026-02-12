@@ -57,6 +57,7 @@ div {
   /* display: flex; */
   /* justify-content: center; /* Centers horizontally */
   /* align-items: center;    /*Centers vertically */
+  margin-bottom: 20px;
 
 }
 
@@ -128,7 +129,7 @@ table {
 .op {
   /* display:flex; */
   /* flex-flow: row */
-  padding: 0 auto;
+  /* padding: 0 auto; */
 }
 
 /* .play { */
@@ -144,10 +145,10 @@ table {
   width: 250px;
   height: 100px;
   font-size: 40px;
-  border-color: #fff;
+  border-color: #ff1f1f;
   padding: 12px;
   border: .00625rem solid;
-  -webkit-appearance: button;
+  /* -webkit-appearance: button; */
   margin: 0;
   overflow: visible;
 }
@@ -164,17 +165,14 @@ table {
   /*  */
   /* display: flex; */
   /* display: inline-block; */
-  padding: 0px 0px;
+  /* padding: 20px 20px; */
   /* justify-content: left; */
-  flex-flow: wrap;
+  /* flex-flow: wrap; */
 
-  /* margin: 20px 20px; */
+  margin: 20px 20px;
 
-
-  /* make it more evenly spaced for all cards by adding a border to non disabled cards*/
-  img:not(.disabled) {
-    border: 2px solid #00b840;
-  }
+    /* border: 1px solid grey; */
+  
 }
 
 .hand>label {
@@ -187,8 +185,9 @@ table {
 }
 
 .button-labels {
-  display: block;
-
+  /* border: solid #00b840; */
+border: 1px solid #00b840;
+color: #009e1a48;
 }
 
 .hand>h2 {
@@ -279,16 +278,22 @@ label img {
 
 :checked+label img {
   position: inline;
-  transform: translateY(-20px);
+  /* transform: translateY(-20px); */
 
   /* makes sure suit buttons stay hidden */
   box-shadow: 0 0 5px #333;
+
+  /* label img:not(label img buttons){ */
+  margin-bottom: 20px;
+  
 }
 
 .disabled {
-  border: solid;
+   /* border: solid;
 
-  border-color: rgb(165, 42, 42);
+  border-color: #a52a2a;  */
+
+  border: 1px solid #a52a2a;
 
 }
 
@@ -359,6 +364,7 @@ label img {
   position: relative;
   background-repeat: no-repeat;
   background-color: #ffffff;
+  color: #009e1a48;
 }
 
 .ace_btns {
@@ -369,8 +375,15 @@ label img {
   position: relative;
   background-repeat: no-repeat;
   background-color: #ffffff;
+  color: #009e1a48;
 }
 
+.suit_btns {
+  /* display: block;
+  margin: 20px; */
+
+  color: #009e1a48;
+}
 
  button[id="ks_button"]{
   background-image: url(/images/KS_symbol.png);
@@ -413,13 +426,16 @@ button[id="ad_button"]{
 :checked+label img[id="cKS"]~.king_btns,
 :checked+label img[id="cKC"]~.king_btns {
   display: block;
-  border: 2px solid #009e1a48;
+  /* border: 1px solid #009e1a48; */
+  color: #009e1a48;
   /* try to make cropping work */
   width: 50px;
   height: 30px;
 
+  /* margin-bottom: 20px; */
   overflow: hidden;
-  /* transform: translateY(20px) */
+  
+  /* transform: translateY(-20px) */
 }
 
 /* for buttons the other one is just going for before 
@@ -460,13 +476,15 @@ button[id="ad_button"]{
 :checked+label img[id="cAS"]~.ace_btns,
 :checked+label img[id="cAC"]~.ace_btns {
   display: block;
-display: block;
-  border: 2px solid #009e1a48;
+
+  color: #009e1a48;
+  /* border: 2px solid #009e1a48; */
   /* try to make cropping work */
   width: 50px;
   height: 30px;
 
   overflow: hidden;
+  
   /* transform: translateY(20px) */
 }
 
