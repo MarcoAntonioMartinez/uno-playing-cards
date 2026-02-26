@@ -1,3 +1,9 @@
+<%# if @win %>
+<!--<form action="/result">-->
+<%# else %>
+<!--<form action="/discard">-->
+<%# end %>
+<!---->
 <form action="/discard">
 
   <div class="scroll-container">
@@ -76,7 +82,20 @@
         <img src="https://deckofcardsapi.com/static/img/back.png"  />
       </label>
     <% else %>
-      <button> discard</button>
+
+    <% if @win %>
+
+<button formaction="/result" type="submit" name="result" value="win"> discard</button>
+<elsif @cpu_empty>
+<button formaction="/result" type="submit" name="result" value="lose"> discard</button>
+
+<% else %> 
+
+<button formaction="/discard" type="submit"> discard</button>
+<% end %>
+
+
+      <!--<button> discard</button>-->
       <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
         <img src="https://deckofcardsapi.com/static/img/back.png"  />
       </label>
