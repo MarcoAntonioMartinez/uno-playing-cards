@@ -14,7 +14,7 @@
 <!-- class="hand" -->
     <h2> Your hand</h2>
  
-  <div class="hand">
+  <div >
     <!-- <div id="img"> -->
 
     <% @card_arr.each_with_index do |c, i| %>
@@ -32,6 +32,7 @@
           <li><input type="checkbox" id="card<%= i %>" name="<%= @code_arr[i] %>"  />
 
             <label class="button-labels" for="card<%= i %>" >
+              <div class ="suit_btns">
               <img src="<%= c %>" id="c<%= @code_arr[i] %>"   />
 
               
@@ -45,7 +46,8 @@
                 <button id="ac_button" name="ace" value="AC" class="ace_btns">  </button>
                 <button id="ah_button" name="ace" value="AH" class="ace_btns">  </button>
                 <button id="ad_button" name="ace" value="AD" class="ace_btns">  </button>
-
+                
+</div>
 
             </label>
 
