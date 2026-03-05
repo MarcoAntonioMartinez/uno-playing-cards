@@ -35,7 +35,7 @@ end
 def discard(arr, disc_arr)
   h_arr = []
   rand_index = 0
-@can_rand_discard = true
+  @can_rand_discard = true
 
   # h_arr has all cards from arr that are able to be discarded
   h_arr = arr.select { |h| !disc_arr.include?(h) }
@@ -44,7 +44,7 @@ def discard(arr, disc_arr)
     puts "arr and disc_arr are equal no card can be discarded"
     @can_rand_discard = false
   else
-  rand_index = rand(0..h_arr.length - 1)
+    rand_index = rand(0..h_arr.length - 1)
   end
   # return h_arr[rand_index] # so i think i either need to put this whole function after the if statement for discarding as part of the else statement or something and @hand array will have to be an array which takes from whatever array is being worked on in if ace king statement
   # h_arr is image which would be randomly chosen so add to discard pile
@@ -164,8 +164,6 @@ def cpu_action(value, suit)
   if ((value == "JACK" || value == "QUEEN") && session[:player_turn] == true)
 
     # @text.push("Player discarded a #{value}, skipping the CPU's turn.")
-    
-    
 
     jq_cnt += 1
   else
@@ -260,6 +258,7 @@ def cpu_action(value, suit)
       @dis_val = cookies[:disc_val]
       @dis_suit = cookies[:disc_suit]
 
+      puts "cookies disc val is  #{cookies[:disc_val]}"
       pile_name = "cpu_hand"
       #add to cpu_hand
       pile = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/add/?cards=" + drawn_cpu_card
@@ -401,7 +400,7 @@ def cpu_action(value, suit)
 
         cookies[:disc_val] = @dis_val
         cookies[:disc_suit] = @dis_suit
-
+ puts "cookies[:disc_val] in cpu action if!has is #{ cookies[:disc_val]}"
         # if session[:text] != nil
         #   if session[:text].is_a?(String)
         @text.push("\n\nCPU discards #{cpu_d_val} of #{cpu_d_suit}")
@@ -444,9 +443,10 @@ def cpu_action(value, suit)
     if cpu_d_val == "KING"
       #use cookies cpu_val
       cookies[:last_suit] = dis_king_suit
+      cpu_d_suit = dis_king_suit
     elsif cpu_d_val == "ACE"
       #use cookies cpu_val
-
+      cpu_d_suit = dis_ace_suit
       cookies[:last_suit] = dis_ace_suit
     end
   end
@@ -455,9 +455,10 @@ def cpu_action(value, suit)
     @cpu_empty = true
   end
 
-puts "cpu_empty is " + @cpu_empty.to_s
-  cookies[:disc_val] = cpu_d_val
-  cookies[:disc_suit] = cpu_d_suit
+  # do i even need the below code? maybe not i feel like
+
+  puts "cpu_empty is " + @cpu_empty.to_s
+
 end #end function
 
 get("/") do
@@ -642,7 +643,7 @@ get("/discard") do
 
   d_res = []
 
-# set variable to be used to determine result for game like win or lose
+  # set variable to be used to determine result for game like win or lose
   @win = false
 
   #these arrs holds all kings and aces used to check if king or ace cpu is looking for is in player's hand
@@ -774,10 +775,9 @@ get("/discard") do
       @code_arr.push(discarded_code)
       cookies[:disc_val] = discarded_value
       cookies[:disc_suit] = discarded_suit
-      puts "discarded_value is #{discarded_value}"
-      puts "discarded_suit is #{discarded_suit}"
-      puts "cookies[:disc_val] is #{cookies[:disc_val]}"
-      
+      # puts "discarded_value is #{discarded_value}"
+      # puts "discarded_suit is #{discarded_suit}"
+      # puts "cookies[:disc_val] is #{cookies[:disc_val]}"
     end #end of if for params?
 
     pile_name = "hand"
@@ -809,16 +809,14 @@ get("/discard") do
 
     #save it so can tell if cpu drew a card
     if @new_images != nil
-      cpu_length = @new_images.length
+      cpu_length = 7
     else
       cpu_length = 0
     end
   else # random if
-
-pile_name = "hand"
+    pile_name = "hand"
     hand_list = "https://deckofcardsapi.com/api/deck/" + deck + "/pile/" + pile_name + "/list/"
     @hand = api_response(hand_list, "piles").fetch(pile_name).fetch("cards")
-
 
     last_card = @discard_pile.last
 
@@ -907,9 +905,29 @@ pile_name = "hand"
   # rand_hand = cookies[:random_hand].split(",")
 
   # val = cookies[:]
-
+# puts "cookies[:disc_val] before cpuaction is #{cookies[:disc_val]}"
+  # puts "discarded_value in discard before cpu action is #{discarded_value}"
   #not sure where to put this
   cpu_action(discarded_value, discarded_suit)
+  # puts "cookies[:disc_val] after cpu action is #{cookies[:disc_val]}"
+# puts "discarded_value in discard after cpu action is #{discarded_value}"
+#   cookies[:disc_val]
+# puts "cookies[:disc_val] is #{cookies[:disc_val]}"
+# puts "cookies[:disc_val].class is #{cookies[:disc_val].class}"
+#   if discarded_value == "JACK" 
+#     cookies[:disc_val] == "JACK"
+# # puts "cookies[:disc_val] is in discard val jack #{cookies[:disc_val]}"
+#     cookies[:disc_suit] == discarded_suit
+
+#   elsif discarded_value == "QUEEN"
+    
+#     cookies[:disc_val] == "QUEEN"
+
+#     puts "cookies[:disc_val] is in discard val queen #{cookies[:disc_val]}"
+#     cookies[:disc_suit] == discarded_suit
+
+  # end
+  # $ either update disc cookies here or in draw for cpu
 
   #potential place to put if for queen jack skipping player turn
 
@@ -957,15 +975,21 @@ pile_name = "hand"
 
   cookies[:top_code] = top_code
 
-  # if cpu cards well it has to do with when drawing instead of discarding on first turn
-  if cpu_length != @new_images.length + 1
+  # if cpu cards well it has to do with when player draws instead of discarding on first turn
+ 
+  
+  if cpu_length != @new_images.length
     top_val = cookies[:disc_val]
     top_suit = cookies[:disc_suit]
+    # puts "cookies[:disc_val] in cpu length != is #{cookies[:disc_val]}"
+    # puts "cookies disc val in discard after top code is  #{cookies[:disc_val]}"
   else # otherwise top_val is what was just discarded bc cpu didnt discard
     top_val = discarded_value
     top_suit = discarded_suit
+    # puts "cookies[:disc_val] in cpu length != else is #{cookies[:disc_val]}"
   end
 
+  # puts "top suit is #{top_suit}"
   #make it so the cards that do not match the most recent card are disabled
 
   #make array that's filled with cards that do not match the suit or value of card in discard pile or are not king or ace cards
@@ -993,12 +1017,14 @@ pile_name = "hand"
     cookies[:disable] = @is_disabled.join(",")
 
     # if there is nothing in disabled array and there is only one card in hand
-    if @disabled_arr.length == 0 && @hand_arr == 1
-      
+    # @disabled_arr.length == 0 &&
+    if @hand_arr.length == 1
+puts "disabled length is #{@disabled_arr.length}"
       # then result will become win
       @win = true
     end
 
+    puts @win
     ######################################### end of disabled logic
 
     ################################################### start of take discarded card and place on discard pile do action if necessary - either suit must match or value must match
@@ -1063,6 +1089,9 @@ get("/draw") do
   ################################################### start of check if any card in hand matches discard pile if none then draw card and next player takes their turn  kind of is part of discard and do action
   deck = cookies[:deck_id]
 
+  top_val = cookies[:disc_val]
+  top_suit = cookies[:disc_suit]
+
   pile_name = "hand"
   @did_draw = params.fetch("draw")
 
@@ -1122,16 +1151,14 @@ get("/draw") do
 
   @discard_pile = cookies[:discard_pile].split(",")
 
-  @discard_pile.each_with_index do |d, i|
-    if i == @discard_pile.length - 1
-      @top_discard = d #image need code,value,suit
-    end
-  end
+  @top_discard = @discard_pile.last
+  puts "discard pile is #{@discard_pile}"
+
   #get code from image string
   top_code = @top_discard.gsub(/[A-Z]/, "")
 
   cookies[:top_code] = top_code
-
+  puts "top_code is #{@top_discard}"
   #this gives last one done by cpu i need the actual last discard
   # if cookies[:last_val] == nil
   #   top_val = cookies[:cpu_val]
@@ -1150,12 +1177,18 @@ get("/draw") do
 
   @text.push("You drew a card") #discarded the #{discarded_value} of #{discarded_suit}")
 
+  #this has to be here to get top discard
+  # cpu_action(@top_discard.fetch("value"), @top_discard.fetch("suit"))
+  cpu_action(top_val, top_suit)
+
   #make array that's filled with cards that do not match the suit or value of card in discard pile or are not king or ace cards
   @disabled_arr = []
   @disable = []
 
   top_val = cookies[:disc_val]
   top_suit = cookies[:disc_suit]
+
+  puts "disc suit is #{@disc_suit}"
 
   #has code for cards in hand
 
@@ -1185,24 +1218,24 @@ get("/draw") do
   ######################################### end of disabled logic
   # puts @top_discard
 
-  #this has to be here to get top discard
-  # cpu_action(@top_discard.fetch("value"), @top_discard.fetch("suit"))
-  cpu_action(top_val, top_suit)
-
   #try to update value and suit to make discarding in draw work
-  cookies[:disc_val] = top_val
-  cookies[:disc_suit] = top_suit
+  # cookies[:disc_val] = top_val
+  # cookies[:disc_suit] = top_suit
 
   erb(:draw)
 end
 
 get ("/result") do
-  fetched = params.fetch(result)
+  fetched = params.fetch("result")
 
-  if fetched == win
-    @result = win
+  if fetched == "win"
+    @result = "win"
   else
-    @result = lose
+    @result = "lose"
   end
   erb(:result)
+end
+
+get ("/win") do
+ erb(:win)
 end
