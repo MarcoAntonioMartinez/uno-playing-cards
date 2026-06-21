@@ -1,3 +1,4 @@
+/*
 import  * as THREE from 'three';
 import { vertexShader, fragShader } from "./shaders.js";
 import {OrbitControls} from '/three/addons/controls/OrbitControls.js'; 
@@ -88,3 +89,5 @@ window.addEventListener('resize', function(){
 //   renderer.render(scene, camera);
 // }
 // render();
+
+*/
