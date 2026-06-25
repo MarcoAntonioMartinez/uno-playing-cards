@@ -46,14 +46,14 @@
               <img src="<%= @image[i] %>" id="c<%= @code_arr[i] %>" />
 
               <button id="ks_button" name="king" value="KS" class="king_btns">  </button>
-                <button id="kc_button" name="king" value="KC" class="king_btns">  </button>
-                <button id="kh_button" name="king" value="KH" class="king_btns">  </button>
-                <button id="kd_button" name="king" value="KD" class="king_btns">   </button>
+              <button id="kc_button" name="king" value="KC" class="king_btns">  </button>
+              <button id="kh_button" name="king" value="KH" class="king_btns">  </button>
+              <button id="kd_button" name="king" value="KD" class="king_btns">   </button>
 
-                <button id="as_button" name="ace" value="AS" class="ace_btns">   </button>
-                <button id="ac_button" name="ace" value="AC" class="ace_btns">  </button>
-                <button id="ah_button" name="ace" value="AH" class="ace_btns">  </button>
-                <button id="ad_button" name="ace" value="AD" class="ace_btns">  </button>
+              <button id="as_button" name="ace" value="AS" class="ace_btns">   </button>
+              <button id="ac_button" name="ace" value="AC" class="ace_btns">  </button>
+              <button id="ah_button" name="ace" value="AH" class="ace_btns">  </button>
+              <button id="ad_button" name="ace" value="AD" class="ace_btns">  </button>
 
             </label>
           </li>
@@ -83,32 +83,35 @@
       </label>
     <% else %>
 
-    <% if @win %>
+      <% if @win %>
 
-<button formaction="/result" type="submit" name="result" value="win"> discard</button>
-<elsif @cpu_empty>
-<button formaction="/result" type="submit" name="result" value="lose"> discard</button>
+        <button formaction="/result" type="submit" name="result" value="win"> discard</button>
+        <elsif @cpu_empty>
+          <button formaction="/result" type="submit" name="result" value="lose"> discard</button>
 
-<% else %> 
+        <% else %>
 
-<button formaction="/discard" type="submit"> discard</button>
-<% end %>
+          <button formaction="/discard" type="submit"> discard</button>
+        <% end %>
 
+        <!--<button> discard</button>-->
+        <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
+          <img src="https://deckofcardsapi.com/static/img/back.png"  />
+        </label>
 
-      <!--<button> discard</button>-->
-      <label for="next_draw" id="next_draw_img"> <button formaction="/draw" type="submit" id="next_draw" name="draw" value="next_draw"> draw</button>
-        <img src="https://deckofcardsapi.com/static/img/back.png"  />
-      </label>
+      <% end %>
 
-    <% end %>
+    </div>
 
-  </div>
+    <div>
+      <div class="scroll-container-discard">
+        <div class="long-content-discard">
+          <h2 id="disc_h2"> Discard pile</h2>
+          <% @discard_pile.each_with_index do |c, i| %>
+            <label>  <img src="<%= c %>" id="d<%= i+1 %>"  /></label>
+          <% end %> <!-- end of loop -->
 
-  <div>
-    <h2> Discard pile</h2>
-    <% @discard_pile.each_with_index do |c, i| %>
-      <label>  <img src="<%= c %>" id="d<%= i+1 %>"  /></label>
-    <% end %> <!-- end of loop -->
-
-  </div>
-</form>
+        </div>
+      </div>
+    </div>
+  </form>

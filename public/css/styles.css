@@ -1,6 +1,6 @@
 * {
 
-  border: 1px red dashed;
+  /* border: 1px red dashed; */
  margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -88,7 +88,7 @@ div {
   /* justify-content: center; /* Centers horizontally */
   /* align-items: center;    /*Centers vertically */
   margin-bottom: 20px;
-
+padding:20px;
 
 
 }
@@ -234,9 +234,15 @@ table {
 .op {
   /* display:flex; */
   /* flex-flow: row */
-  /* padding: 0 auto; */
+  padding: 20px; 
+  margin: 20px 20px;
+  width: 614px;
 }
 
+#disc_h2 {
+  
+  margin-left: 30%;
+}
 /* .play { */
 /* justify-content: center; */
 /* width: 100px;
@@ -290,11 +296,13 @@ table {
 
 .hand>label {
   display: inline;
+width: 126px;
 }
 
 .hand>li {
   display: flex;
   flex-flow: row nowrap;
+  
 }
 
 .button-labels {
@@ -428,7 +436,7 @@ label img {
 }
 
 .scroll-container {
-  width: 400px;
+  width: 700px;
   height: 300px;
   border: 1px solid #ccc;
   overflow: auto;
@@ -437,8 +445,10 @@ label img {
   padding: 10px;
 }
 
+
+
 .long-content {
-  width: 500px;
+  width: 700px;
   /* Wider than container */
   height: 400px;
 
@@ -447,12 +457,12 @@ label img {
   padding: 20px;
 
   P {
-    text-align: left;
+    text-align: center;
   }
 }
 
 .scroll-container-discard {
-  width: 700px;
+  width: 770px;
   height: 600px;
   border: 1px solid #ccc;
   overflow: auto;

@@ -6,6 +6,7 @@
 <%# end %>
 <!---->
 <form >
+  <div class="scroll">
   <div class="scroll-container">
 
     <div class="long-content">
@@ -15,7 +16,9 @@
     </div>
 
   </div>
+  </div>
 
+</>
   <div class="op">
     <h2> op's hand</h2>
     <% @new_images.each_with_index do |c,i| %>
@@ -26,7 +29,7 @@
   </div>
 
   <div>
-    <h2> Your hand</h2>
+    <h2 id="hand"> Your hand</h2>
 
     <% @hand_arr.each_with_index do |c, i| %>
 
@@ -96,7 +99,7 @@
   <%# end %>
 
 
-    <h2> Discard pile</h2>
+    <h2 id="disc_h2"> Discard pile</h2>
 <div class="scroll-container-discard">
   <div class="long-content-discard">
 
